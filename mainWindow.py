@@ -41,6 +41,7 @@ class threading(QtWidgets.QMainWindow):
         self.thread4_state = 0
         self.thread5_state = 0
         self.thread6_state = 0
+        self.thread7_state = 0
 
     def tutorial_worker(self):
         self.thread[1] = tutorial_thread(parent=None)
