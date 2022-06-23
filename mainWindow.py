@@ -1,8 +1,13 @@
 from PyQt5 import QtCore, QtWidgets, QtGui, uic
 from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication
 from multimediav1 import VideoPlayer
-import sys, time, serial, struct, csv, datetime
 import serial.tools.list_ports
+import datetime
+import serial 
+import struct 
+import time
+import sys 
+import csv 
 
 def serial_checker():
     port_name = ''
@@ -287,7 +292,6 @@ class start_thread_timer(QtCore.QThread):
     def stop(self):
         print('Stopping start_thread_timer...')
         self.is_running = False
-        # self.terminate()
 
 class tare_thread(QtCore.QThread):
     any_signal8 = QtCore.pyqtSignal(int)
@@ -320,6 +324,8 @@ def TODO_LOG():
 
 # 1. Bikin data logger CSV untuk volume ASI, dan ditampilin secara
 #    grafik di GUI
+#       STEP:
+#       ...
 # 2. Bikin command button mesin pijat:
 #    - Power
 #    - Seat Vibration
