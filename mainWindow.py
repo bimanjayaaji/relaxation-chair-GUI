@@ -282,11 +282,12 @@ class start_thread_timer(QtCore.QThread):
         super(start_thread_timer,self).__init__(parent)
         self.is_running = True
         self.timer = timer
-        self.time_old = time.perf_counter()
     def run(self):
         print('Starting start_thread_timer...')
-        while (time.perf_counter() < self.time_old + (self.timer*60)):
-            pass
+        self.time_old = time.perf_counter()
+        timing = self.time_old + (self.timer*60)
+        while (time.perf_counter() < timing):
+            remain = round(timing - time.perf_counter())
         time.sleep(0.01)
         self.any_signal7.emit(0) # index untuk nanti ngestop
     def stop(self):
@@ -464,7 +465,14 @@ def PROBLEM_LOG():
 #     (PUZZLED)
 # HASIL:
 # ------------------------------------------------------------------------
-    
+# 11
+# PROBLEM:
+#      Kalau sistem kelar ("STOP"), keterangan realtime volume ga balik ke 0
+# IDE:
+#      Ketika "STOP", labelnya ganti balik ke 0
+# HASIL:
+#      
+
     pass
 
 def FEATUREIDEA_LOG():
