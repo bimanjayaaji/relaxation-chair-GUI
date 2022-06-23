@@ -286,7 +286,7 @@ class start_thread_timer(QtCore.QThread):
     def stop(self):
         print('Stopping start_thread_timer...')
         self.is_running = False
-        self.terminate()
+        # self.terminate()
 
 class tare_thread(QtCore.QThread):
     any_signal8 = QtCore.pyqtSignal(int)
