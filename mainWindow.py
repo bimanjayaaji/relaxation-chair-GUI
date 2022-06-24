@@ -40,6 +40,11 @@ class threading(QtWidgets.QMainWindow):
         self.saveButton.clicked.connect(self.save_worker)
         self.tareButton.clicked.connect(self.tare_worker)
 
+        self.startButton.setEnabled(True)
+        self.stopButton.setEnabled(False)
+        self.saveButton.setEnabled(False)
+        self.tareButton.setEnabled(False)
+
         self.thread1_state = 0
         self.thread2_state = 0
         self.thread3_state = 0
@@ -51,6 +56,7 @@ class threading(QtWidgets.QMainWindow):
     def tutorial_worker(self):
         self.thread[1] = tutorial_thread(parent=None)
         self.thread[1].start()
+        self.thread1_state = 1
         self.thread[1].any_signal1.connect(self.tutorial_action)
 
     def start_worker(self):
@@ -63,47 +69,52 @@ class threading(QtWidgets.QMainWindow):
 
                 if serial_checker() == '/dev/ttyUSB0':
 
-                    # START VIDEO
-                    self.thread[2] = start_thread_video(parent=None)
-                    self.thread[2].start()
-                    self.thread[2].any_signal2.connect(self.start_action_video)
-                    self.thread2_state = 1
-                    time.sleep(0.3)
+                    self.startButton.setEnabled(False)
+                    self.stopButton.setEnabled(True)
+                    self.saveButton.setEnabled(False)
+                    self.tareButton.setEnabled(True)
 
                     # START GET LOADCELL DATA
                     self.thread[3] = start_thread_getLoadcell(parent=None)
                     self.thread[3].start()
                     self.thread[3].any_signal3.connect(self.start_action_getLoadcell)
                     self.thread3_state = 1
-                    time.sleep(0.3)
+                    time.sleep(0.2)
+
+                    # START VIDEO
+                    self.thread[2] = start_thread_video(parent=None)
+                    self.thread[2].start()
+                    self.thread[2].any_signal2.connect(self.start_action_video)
+                    self.thread2_state = 1
+                    time.sleep(0.2)
                         
                     # START MASSAGE COMMAND
                     self.thread[4] = start_thread_massage(parent=None)
                     self.thread[4].start()
                     self.thread[4].any_signal4.connect(self.start_action_massage)
                     self.thread4_state = 1
-                    time.sleep(0.3)
+                    time.sleep(0.2)
 
                     # START GET EEG DATA
                     self.thread[5] = start_thread_EEG(parent=None)
                     self.thread[5].start()
                     self.thread[5].any_signal5.connect(self.start_action_EEG)
                     self.thread5_state = 1
-                    time.sleep(0.3)
+                    time.sleep(0.2)
 
                     # START PUMP COMMAND
                     self.thread[6] = start_thread_pump(parent=None)
                     self.thread[6].start()
                     self.thread[6].any_signal6.connect(self.start_action_pump)
                     self.thread6_state = 1
-                    time.sleep(0.3)
+                    time.sleep(0.2)
 
                     # START TIMER
                     self.thread[7] = start_thread_timer(self.timeSpinBox.value(),parent=None)
                     self.thread[7].start()
                     self.thread[7].any_signal7.connect(self.start_action_timer)
                     self.thread7_state = 1
-                    time.sleep(0.3)
+                    time.sleep(0.2)
 
                 else:
                     msg = QMessageBox()
@@ -126,6 +137,12 @@ class threading(QtWidgets.QMainWindow):
             self.thread[8].any_signal8.connect(self.tare_action)
 
     def stop_worker(self):
+
+        self.startButton.setEnabled(True)
+        self.stopButton.setEnabled(False)
+        self.tareButton.setEnabled(False)
+        self.saveButton.setEnabled(True)
+
         if self.thread2_state == 1:
             self.thread[2].stop()
             self.thread2_state = 0
@@ -231,6 +248,8 @@ class start_thread_getLoadcell(QtCore.QThread):
         vol = 0
         ser = serial.Serial('/dev/ttyUSB0',57600,timeout=1.5)
         ser.flush()
+        ser.write(b't')
+        time.sleep(0.1)
         while (True):
             if ser.in_waiting > 0:
                 data = ser.read(9)
@@ -284,12 +303,29 @@ class start_thread_timer(QtCore.QThread):
         self.timer = timer
     def run(self):
         print('Starting start_thread_timer...')
-        self.time_old = time.perf_counter()
+        # self.time_old = time.perf_counter()
+        # timing = self.time_old + (self.timer*60)
+        # while (time.perf_counter() < timing):
+        #     remain = round(timing - time.perf_counter())
+        # time.sleep(0.01)
+        # time.sleep(self.timer*60) # BISA
+
+        # self.time_old = time.time()
+        # timing = self.time_old + (self.timer*60)
+        # while (time.time() < timing):
+        #     remain = round(timing - time.time())
+        #     print(remain)
+
+        self.time_old = time.time()
         timing = self.time_old + (self.timer*60)
-        while (time.perf_counter() < timing):
-            remain = round(timing - time.perf_counter())
-        time.sleep(0.01)
-        self.any_signal7.emit(0) # index untuk nanti ngestop
+        while (True):
+            if (time.time() < timing):
+                remain = round(timing - time.time())
+                print(remain)
+            else:
+                self.any_signal7.emit(0) # index untuk nanti ngestop        
+
+        # self.any_signal7.emit(0) # index untuk nanti ngestop
     def stop(self):
         print('Stopping start_thread_timer...')
         self.is_running = False
@@ -471,7 +507,20 @@ def PROBLEM_LOG():
 # IDE:
 #      Ketika "STOP", labelnya ganti balik ke 0
 # HASIL:
+# ------------------------------------------------------------------------
+# 12
+# PROBLEM:
+#      Ketika dah ditambahi fitur button setEnabled on atau off.. ketika sistem
+#      distop manual melalui tombol "STOP", sistem crash. Kalau stop secara otomatis
+#      melalui timer, sistem normal
+# IDE:
+#      Ada masalah di looping while timer. Kalo pake while trus di fungsi stop dikasi
+#      self.terminate(), error. Kalo ga dikasi self.terminate(), ga error tapi loop fungsi run()
+#      gabisa stop.
+# HASIL:
+# ------------------------------------------------------------------------
 #      
+
 
     pass
 
