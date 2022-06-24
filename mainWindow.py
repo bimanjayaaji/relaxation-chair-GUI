@@ -308,24 +308,27 @@ class start_thread_timer(QtCore.QThread):
         # while (time.perf_counter() < timing):
         #     remain = round(timing - time.perf_counter())
         # time.sleep(0.01)
-        # time.sleep(self.timer*60) # BISA
+        # self.any_signal7.emit(0) # index untuk nanti ngestop
+
+        time.sleep(self.timer*60) # BISA
+        self.any_signal7.emit(0) # index untuk nanti ngestop
 
         # self.time_old = time.time()
         # timing = self.time_old + (self.timer*60)
         # while (time.time() < timing):
         #     remain = round(timing - time.time())
         #     print(remain)
-
-        self.time_old = time.time()
-        timing = self.time_old + (self.timer*60)
-        while (True):
-            if (time.time() < timing):
-                remain = round(timing - time.time())
-                print(remain)
-            else:
-                self.any_signal7.emit(0) # index untuk nanti ngestop        
-
         # self.any_signal7.emit(0) # index untuk nanti ngestop
+
+        # self.time_old = time.time()
+        # timing = self.time_old + (self.timer*60)
+        # while (True):
+        #     if (time.time() < timing):
+        #         remain = round(timing - time.time())
+        #         print(remain)
+        #     else:
+        #         self.any_signal7.emit(0) # index untuk nanti ngestop        
+
     def stop(self):
         print('Stopping start_thread_timer...')
         self.is_running = False
