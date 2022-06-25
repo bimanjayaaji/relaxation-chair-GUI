@@ -1,5 +1,7 @@
+from re import I
 from PyQt5 import QtCore, QtWidgets, QtGui, uic
 from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication
+from numpy import var
 from multimediav1 import VideoPlayer
 import serial.tools.list_ports
 import datetime
@@ -52,6 +54,12 @@ class threading(QtWidgets.QMainWindow):
         self.thread5_state = 0
         self.thread6_state = 0
         self.thread7_state = 0
+        self.thread9_state = 0
+
+        self.realtimeVol = 0
+        self.csv_data = []
+        self.rec_rate = 1
+        self.rec_oldtime = 0
 
     def tutorial_worker(self):
         self.thread[1] = tutorial_thread(parent=None)
@@ -116,6 +124,16 @@ class threading(QtWidgets.QMainWindow):
                     self.thread7_state = 1
                     time.sleep(0.2)
 
+                    # START CSV RECORD TIMER
+                    # self.thread[9] = start_thread_timer_csvASI(parent=None)
+                    # self.thread[9].start()
+                    # self.thread[9].any_signal9.connect(self.start_action_timer_csvASI)
+                    # self.thread9_state = 1
+                    # time.sleep(0.1)
+
+                    self.csv_data = []
+                    self.rec_oldtime = time.time()
+
                 else:
                     msg = QMessageBox()
                     msg.setWindowTitle('PERINGATAN')
@@ -161,6 +179,9 @@ class threading(QtWidgets.QMainWindow):
         if self.thread7_state == 1:
             self.thread[7].stop()
             self.thread7_state = 0
+        # if self.thread9_state == 1:
+        #     self.thread[9].stop()
+        #     self.thread9_state = 0
 
     def save_worker(self):
         pass
@@ -187,6 +208,11 @@ class threading(QtWidgets.QMainWindow):
     def start_action_getLoadcell(self,var2_1):
         self.realtimeASI.setText(str(var2_1))
         self.realtimeASI.adjustSize()
+        self.realtimeVol = var2_1
+        if ((time.time() - self.rec_oldtime) >= self.rec_rate):
+            self.csv_data.append(var2_1)
+            self.rec_oldtime = time.time()
+            print(self.csv_data)
 
     def start_action_massage(self,var2_2):
         print(var2_2)
@@ -199,6 +225,10 @@ class threading(QtWidgets.QMainWindow):
 
     def start_action_timer(self,var2_5):
         self.stop_worker()
+
+    def start_action_timer_csvASI(self):
+        self.csv_data.append(self.realtimeVol)
+        print(self.csv_data)
 
     def tare_action(self,var3):
         pass
@@ -257,7 +287,6 @@ class start_thread_getLoadcell(QtCore.QThread):
                 data2 = data[5:9]
                 mass = struct.unpack('<f', data1)[0]
                 vol = struct.unpack('<f',data2)[0]
-
             time.sleep(0.01)
             self.any_signal3.emit(vol)
     def stop(self):
@@ -303,35 +332,28 @@ class start_thread_timer(QtCore.QThread):
         self.timer = timer
     def run(self):
         print('Starting start_thread_timer...')
-        # self.time_old = time.perf_counter()
-        # timing = self.time_old + (self.timer*60)
-        # while (time.perf_counter() < timing):
-        #     remain = round(timing - time.perf_counter())
-        # time.sleep(0.01)
-        # self.any_signal7.emit(0) # index untuk nanti ngestop
-
         time.sleep(self.timer*60) # BISA
         self.any_signal7.emit(0) # index untuk nanti ngestop
-
-        # self.time_old = time.time()
-        # timing = self.time_old + (self.timer*60)
-        # while (time.time() < timing):
-        #     remain = round(timing - time.time())
-        #     print(remain)
-        # self.any_signal7.emit(0) # index untuk nanti ngestop
-
-        # self.time_old = time.time()
-        # timing = self.time_old + (self.timer*60)
-        # while (True):
-        #     if (time.time() < timing):
-        #         remain = round(timing - time.time())
-        #         print(remain)
-        #     else:
-        #         self.any_signal7.emit(0) # index untuk nanti ngestop        
-
     def stop(self):
         print('Stopping start_thread_timer...')
         self.is_running = False
+
+class start_thread_timer_csvASI(QtCore.QThread):
+    any_signal9 = QtCore.pyqtSignal(int)
+    def __init__(self,parent=None):
+        super(start_thread_timer_csvASI,self).__init__(parent)
+        self.is_running = True
+    def run(self):
+        print('Starting start_thread_timer_csvASI...')
+        last_time = time.time()
+        while (True):
+            if time.time() - last_time == 1:
+                self.any_signal9.emit(1)
+                last_time = time.time()
+    def stop(self):
+        print('Stopping start_thread_timer_csvASI...')
+        self.is_running = False
+        self.terminate()
 
 class tare_thread(QtCore.QThread):
     any_signal8 = QtCore.pyqtSignal(int)

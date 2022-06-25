@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>799</width>
-    <height>597</height>
+    <height>598</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -65,7 +65,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>120</y>
+      <y>130</y>
       <width>91</width>
       <height>41</height>
      </rect>
@@ -333,26 +333,13 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>100</y>
+      <y>110</y>
       <width>41</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
      <string>Timer</string>
-    </property>
-   </widget>
-   <widget class="QLabel" name="remainingTime">
-    <property name="geometry">
-     <rect>
-      <x>30</x>
-      <y>170</y>
-      <width>41</width>
-      <height>17</height>
-     </rect>
-    </property>
-    <property name="text">
-     <string>00:00</string>
     </property>
    </widget>
    <zorder>frame</zorder>
@@ -367,7 +354,6 @@
    <zorder>frame_3</zorder>
    <zorder>frame_6</zorder>
    <zorder>timerLabel</zorder>
-   <zorder>remainingTime</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
