@@ -65,7 +65,7 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>130</y>
+      <y>120</y>
       <width>91</width>
       <height>41</height>
      </rect>
@@ -83,7 +83,7 @@
       <x>120</x>
       <y>100</y>
       <width>111</width>
-      <height>41</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
@@ -107,9 +107,9 @@
     <property name="geometry">
      <rect>
       <x>120</x>
-      <y>150</y>
+      <y>140</y>
       <width>111</width>
-      <height>41</height>
+      <height>31</height>
      </rect>
     </property>
     <property name="text">
@@ -333,13 +333,26 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>110</y>
+      <y>100</y>
       <width>41</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
      <string>Timer</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="saveLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>180</y>
+      <width>221</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Tidak ada data belum tersimpan</string>
     </property>
    </widget>
    <zorder>frame</zorder>
@@ -354,6 +367,7 @@
    <zorder>frame_3</zorder>
    <zorder>frame_6</zorder>
    <zorder>timerLabel</zorder>
+   <zorder>saveLabel</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">

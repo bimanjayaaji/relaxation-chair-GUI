@@ -22,8 +22,7 @@ def serial_checker():
 
 def time_now():
     now = datetime.datetime.now().strftime("%H:%M:%S")
-    now = str(now)
-    return now
+    return str(now)
 
 def date_now():
     today = datetime.datetime.now().strftime("%Y-%m-%d")
@@ -60,6 +59,8 @@ class threading(QtWidgets.QMainWindow):
         self.csv_data = []
         self.rec_rate = 1
         self.rec_oldtime = 0
+        self.rec_newtime = 0
+        self.rec_i = 0
 
     def tutorial_worker(self):
         self.thread[1] = tutorial_thread(parent=None)
@@ -124,15 +125,12 @@ class threading(QtWidgets.QMainWindow):
                     self.thread7_state = 1
                     time.sleep(0.2)
 
-                    # START CSV RECORD TIMER
-                    # self.thread[9] = start_thread_timer_csvASI(parent=None)
-                    # self.thread[9].start()
-                    # self.thread[9].any_signal9.connect(self.start_action_timer_csvASI)
-                    # self.thread9_state = 1
-                    # time.sleep(0.1)
-
                     self.csv_data = []
                     self.rec_oldtime = time.time()
+                    self.rec_newtime = self.rec_oldtime
+                    self.rec_i = 0
+                    self.saveLabel.setText('Sistem sedang berjalan')
+                    self.saveLabel.adjustSize()
 
                 else:
                     msg = QMessageBox()
@@ -179,9 +177,9 @@ class threading(QtWidgets.QMainWindow):
         if self.thread7_state == 1:
             self.thread[7].stop()
             self.thread7_state = 0
-        # if self.thread9_state == 1:
-        #     self.thread[9].stop()
-        #     self.thread9_state = 0
+
+        self.saveLabel.setText('Ada data belum tersimpan')
+        self.saveLabel.adjustSize()
 
     def save_worker(self):
         pass
@@ -209,9 +207,12 @@ class threading(QtWidgets.QMainWindow):
         self.realtimeASI.setText(str(var2_1))
         self.realtimeASI.adjustSize()
         self.realtimeVol = var2_1
-        if ((time.time() - self.rec_oldtime) >= self.rec_rate):
-            self.csv_data.append(var2_1)
-            self.rec_oldtime = time.time()
+        self.rec_newtime = time.time()
+        if ((self.rec_newtime - self.rec_oldtime) >= self.rec_rate):
+            self.csv_data.append([time_now()])
+            self.csv_data[self.rec_i].append(var2_1)
+            self.rec_oldtime = self.rec_newtime
+            self.rec_i += 1
             print(self.csv_data)
 
     def start_action_massage(self,var2_2):
@@ -337,23 +338,6 @@ class start_thread_timer(QtCore.QThread):
     def stop(self):
         print('Stopping start_thread_timer...')
         self.is_running = False
-
-class start_thread_timer_csvASI(QtCore.QThread):
-    any_signal9 = QtCore.pyqtSignal(int)
-    def __init__(self,parent=None):
-        super(start_thread_timer_csvASI,self).__init__(parent)
-        self.is_running = True
-    def run(self):
-        print('Starting start_thread_timer_csvASI...')
-        last_time = time.time()
-        while (True):
-            if time.time() - last_time == 1:
-                self.any_signal9.emit(1)
-                last_time = time.time()
-    def stop(self):
-        print('Stopping start_thread_timer_csvASI...')
-        self.is_running = False
-        self.terminate()
 
 class tare_thread(QtCore.QThread):
     any_signal8 = QtCore.pyqtSignal(int)
