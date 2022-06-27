@@ -65,6 +65,16 @@ class threading(QtWidgets.QMainWindow):
         self.vol_arr = np.array([])
 
     def list_changer(self):
+        '''
+        THOUGHT 6/27/22-21:36
+        kepikiran: numpy bisa ngubah list ke array pake
+        np.array(list_name)
+        tapi harus satu jenis data type
+        jadi
+        dari list csv_data
+        bikin list baru yg misah 'Waktu' dan 'Nilai'
+        baru bikin ke numpy
+        '''
         for i in self.csv_data:
             np.append(self.time_arr,i[0])
             np.append(self.vol_arr,i[1])
