@@ -562,6 +562,7 @@ def FEATUREIDEA_LOG():
 
 # 1. Kasih keterangan sisa waktu berjalan
 # 2. Bisa custom nama file csv. Jadi ada popup dialog buat input string nama
+# 3. Kasih docstring di tiap fungsi / class
     pass
 
 
