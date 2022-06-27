@@ -1,12 +1,12 @@
-from re import I
 from PyQt5 import QtCore, QtWidgets, QtGui, uic
 from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication
 from numpy import var
 from multimediav1 import VideoPlayer
 import serial.tools.list_ports
+import numpy as np
 import datetime
 import serial 
-import struct 
+import struct
 import time
 import sys 
 import csv 
@@ -61,6 +61,18 @@ class threading(QtWidgets.QMainWindow):
         self.rec_oldtime = 0
         self.rec_newtime = 0
         self.rec_i = 0
+        self.time_arr = np.array([])
+        self.vol_arr = np.array([])
+
+    def list_changer(self):
+        for i in self.csv_data:
+            np.append(self.time_arr,i[0])
+            np.append(self.vol_arr,i[1])
+            print(self.time_arr)
+            print(self.vol_arr)
+    
+    def show_vol_graph(self):
+        pass
 
     def tutorial_worker(self):
         self.thread[1] = tutorial_thread(parent=None)
@@ -181,8 +193,21 @@ class threading(QtWidgets.QMainWindow):
         self.saveLabel.setText('Ada data belum tersimpan')
         self.saveLabel.adjustSize()
 
+        # self.list_changer()
+
     def save_worker(self):
-        pass
+        file = open('/home/bimanjaya/learner/TA/relaxation-chair-GUI/data_logger/load_cell/'+date_now()+'_'+time_now()+'.csv', 'w', newline ='')
+        with file:
+            header = ['Waktu', 'Nilai']
+            writer = csv.DictWriter(file, fieldnames = header)
+            writer.writeheader()
+        file.close()
+        file = open('/home/bimanjaya/learner/TA/relaxation-chair-GUI/data_logger/load_cell/'+date_now()+'_'+time_now()+'.csv', 'a+', newline ='')
+        with file:   
+            write = csv.writer(file)
+            write.writerows(self.csv_data)
+        self.saveLabel.setText('Data baru sudah tersimpan')
+        self.saveLabel.adjustSize()
 
     def tutorial_action(self,var1):
         if var1 == 1:
@@ -226,10 +251,6 @@ class threading(QtWidgets.QMainWindow):
 
     def start_action_timer(self,var2_5):
         self.stop_worker()
-
-    def start_action_timer_csvASI(self):
-        self.csv_data.append(self.realtimeVol)
-        print(self.csv_data)
 
     def tare_action(self,var3):
         pass
@@ -517,7 +538,7 @@ def PROBLEM_LOG():
 #      Ketika "STOP", labelnya ganti balik ke 0
 # HASIL:
 # ------------------------------------------------------------------------
-# 12
+# 12 - DONE
 # PROBLEM:
 #      Ketika dah ditambahi fitur button setEnabled on atau off.. ketika sistem
 #      distop manual melalui tombol "STOP", sistem crash. Kalau stop secara otomatis
@@ -526,7 +547,11 @@ def PROBLEM_LOG():
 #      Ada masalah di looping while timer. Kalo pake while trus di fungsi stop dikasi
 #      self.terminate(), error. Kalo ga dikasi self.terminate(), ga error tapi loop fungsi run()
 #      gabisa stop.
+#
+#      Timer utama sistem pake sistem time.sleep() aja
+#      Nanti timer data_logger pake sistem (NEWTIME - OLDTIME) >= RATE
 # HASIL:
+#      BISA!
 # ------------------------------------------------------------------------
 #      
 
@@ -536,8 +561,9 @@ def PROBLEM_LOG():
 def FEATUREIDEA_LOG():
 
 # 1. Kasih keterangan sisa waktu berjalan
-
+# 2. Bisa custom nama file csv. Jadi ada popup dialog buat input string nama
     pass
+
 
 
 

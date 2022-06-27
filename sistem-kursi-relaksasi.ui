@@ -160,19 +160,6 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QLabel" name="label_4">
-     <property name="geometry">
-      <rect>
-       <x>120</x>
-       <y>150</y>
-       <width>121</width>
-       <height>17</height>
-      </rect>
-     </property>
-     <property name="text">
-      <string>(Monitoring EEG)</string>
-     </property>
-    </widget>
     <widget class="QLabel" name="label_8">
      <property name="geometry">
       <rect>
@@ -214,6 +201,16 @@
        <string>0</string>
       </property>
      </widget>
+    </widget>
+    <widget class="MplWidget" name="MplWidget" native="true">
+     <property name="geometry">
+      <rect>
+       <x>-1</x>
+       <y>59</y>
+       <width>381</width>
+       <height>251</height>
+      </rect>
+     </property>
     </widget>
    </widget>
    <widget class="QFrame" name="frame_3">
@@ -381,6 +378,14 @@
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>MplWidget</class>
+   <extends>QWidget</extends>
+   <header>mplwidget.h</header>
+   <container>1</container>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>
