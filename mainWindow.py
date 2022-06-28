@@ -57,6 +57,8 @@ class threading(QtWidgets.QMainWindow):
 
         self.realtimeVol = 0
         self.csv_data = []
+        self.csv_data_time = []
+        self.csv_data_vol = []
         self.rec_rate = 1
         self.rec_oldtime = 0
         self.rec_newtime = 0
@@ -65,24 +67,13 @@ class threading(QtWidgets.QMainWindow):
         self.vol_arr = np.array([])
 
     def list_changer(self):
-        '''
-        THOUGHT 6/27/22-21:36
-        kepikiran: numpy bisa ngubah list ke array pake
-        np.array(list_name)
-        tapi harus satu jenis data type
-        jadi
-        dari list csv_data
-        bikin list baru yg misah 'Waktu' dan 'Nilai'
-        baru bikin ke numpy
-        '''
-        for i in self.csv_data:
-            np.append(self.time_arr,i[0])
-            np.append(self.vol_arr,i[1])
-            print(self.time_arr)
-            print(self.vol_arr)
+        self.time_arr = np.array(self.csv_data_time)
+        self.vol_arr = np.array(self.csv_data_vol)
     
     def show_vol_graph(self):
-        pass
+        self.MplWidget.canvas.axes.clear()
+        self.MplWidget.canvas.axes.plot(self.csv_data_time, self.csv_data_vol)
+        self.MplWidget.canvas.draw()
 
     def tutorial_worker(self):
         self.thread[1] = tutorial_thread(parent=None)
@@ -148,6 +139,8 @@ class threading(QtWidgets.QMainWindow):
                     time.sleep(0.2)
 
                     self.csv_data = []
+                    self.csv_data_time = []
+                    self.csv_data_vol = []
                     self.rec_oldtime = time.time()
                     self.rec_newtime = self.rec_oldtime
                     self.rec_i = 0
@@ -203,9 +196,15 @@ class threading(QtWidgets.QMainWindow):
         self.saveLabel.setText('Ada data belum tersimpan')
         self.saveLabel.adjustSize()
 
-        # self.list_changer()
+        self.show_vol_graph()
 
     def save_worker(self):
+        for i in self.csv_data_time:
+            self.csv_data.append([i])
+        for j in self.csv_data_vol:
+            self.csv_data[self.rec_i].append(j)
+            self.rec_i += 1
+        print(self.csv_data)
         file = open('/home/bimanjaya/learner/TA/relaxation-chair-GUI/data_logger/load_cell/'+date_now()+'_'+time_now()+'.csv', 'w', newline ='')
         with file:
             header = ['Waktu', 'Nilai']
@@ -244,11 +243,9 @@ class threading(QtWidgets.QMainWindow):
         self.realtimeVol = var2_1
         self.rec_newtime = time.time()
         if ((self.rec_newtime - self.rec_oldtime) >= self.rec_rate):
-            self.csv_data.append([time_now()])
-            self.csv_data[self.rec_i].append(var2_1)
+            self.csv_data_time.append(time_now())
+            self.csv_data_vol.append(var2_1)
             self.rec_oldtime = self.rec_newtime
-            self.rec_i += 1
-            print(self.csv_data)
 
     def start_action_massage(self,var2_2):
         print(var2_2)
