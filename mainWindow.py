@@ -63,8 +63,6 @@ class threading(QtWidgets.QMainWindow):
         self.rec_oldtime = 0
         self.rec_newtime = 0
         self.rec_i = 0
-        self.time_arr = np.array([])
-        self.vol_arr = np.array([])
 
     def list_changer(self):
         self.time_arr = np.array(self.csv_data_time)
@@ -217,6 +215,7 @@ class threading(QtWidgets.QMainWindow):
             write.writerows(self.csv_data)
         self.saveLabel.setText('Data baru sudah tersimpan')
         self.saveLabel.adjustSize()
+        self.saveButton.setEnabled(False)
 
     def tutorial_action(self,var1):
         if var1 == 1:
@@ -238,14 +237,18 @@ class threading(QtWidgets.QMainWindow):
             self.window.close()
 
     def start_action_getLoadcell(self,var2_1):
-        self.realtimeASI.setText(str(var2_1))
-        self.realtimeASI.adjustSize()
-        self.realtimeVol = var2_1
-        self.rec_newtime = time.time()
-        if ((self.rec_newtime - self.rec_oldtime) >= self.rec_rate):
-            self.csv_data_time.append(time_now())
-            self.csv_data_vol.append(var2_1)
-            self.rec_oldtime = self.rec_newtime
+        if var2_1 == False:
+            self.realtimeASI.setText(str(0))
+            self.realtimeASI.adjustSize()
+        else:    
+            self.realtimeASI.setText(str(var2_1))
+            self.realtimeASI.adjustSize()
+            self.realtimeVol = var2_1
+            self.rec_newtime = time.time()
+            if ((self.rec_newtime - self.rec_oldtime) >= self.rec_rate):
+                self.csv_data_time.append(time_now())
+                self.csv_data_vol.append(var2_1)
+                self.rec_oldtime = self.rec_newtime
 
     def start_action_massage(self,var2_2):
         print(var2_2)
@@ -320,6 +323,7 @@ class start_thread_getLoadcell(QtCore.QThread):
             self.any_signal3.emit(vol)
     def stop(self):
         print('Stopping start_thread_getLoadcell...')
+        self.any_signal3.emit(False)
         self.is_running = False
         self.terminate()
 
@@ -394,12 +398,10 @@ if __name__ == '__main__':
     MainWindow.show()
     sys.exit(app.exec_())
 
-def TODO_LOG():
+def MAIN_TODO_LOG():
 
 # 1. Bikin data logger CSV untuk volume ASI, dan ditampilin secara
 #    grafik di GUI
-#       STEP:
-#       ...
 # 2. Bikin command button mesin pijat:
 #    - Power
 #    - Seat Vibration
@@ -416,6 +418,85 @@ def TODO_LOG():
 
 def PROBLEM_LOG():
 
+# ------------------------------------------------------------------------
+# 5
+# PROBLEM:
+#     Kadang muncul error begini:
+#         Traceback (most recent call last):
+#         File "/home/bimanjaya/learner/TA/main/mainWindow.py", line 272, in run
+#         mass = struct.unpack('<f', data1)[0]
+#         struct.error: unpack requires a buffer of 4 bytes
+# IDE:
+#     (PUZZLED)
+# HASIL:
+# ------------------------------------------------------------------------
+# 6
+# PROBLEM:
+#     Kadang muncul error begini:
+#         Starting tareLoadcell_thread...
+#         Traceback (most recent call last):
+#         File "/home/bimanjaya/learner/TA/main/mainWindow.py", line 269, in run
+#             data = ser.read(9)
+#         File "/home/bimanjaya/.conda/envs/selebor/lib/python3.6/site-packages/serial/serialposix.py", line 596, in read
+#             'device reports readiness to read but returned no data '
+#         serial.serialutil.SerialException: device reports readiness to read but returned no data (device disconnected or multiple access on port?)
+#         Aborted (core dumped)
+# IDE:
+#     (PUZZLED)
+# HASIL:
+# ------------------------------------------------------------------------
+# 7
+# PROBLEM:
+#     Kadang muncul error begini kalau nge-resize window videoplayer, dan
+#     setelah selesai ngeklik 'STOP':
+#         ...
+#         QWidget::paintEngine: Should no longer be called
+#         QWidget::paintEngine: Should no longer be called
+#         QWidget::paintEngine: Should no longer be called
+#         QWidget::paintEngine: Should no longer be called
+#         Stopping start_thread_video...
+#         Segmentation fault (core dumped)
+# IDE:
+#     (PUZZLED)
+# HASIL:
+# ------------------------------------------------------------------------
+# 9
+# PROBLEM:
+#     Kalau videoplayer di close pake tanda silang window biasa, videoplayer
+#     ga nge-close, tapi malah nge-hide doang (suaranya masih ada). Jadinya
+#     kalo mau close mainwindow malah error, crash.
+# IDE:
+#     (PUZZLED)
+# HASIL:
+# ------------------------------------------------------------------------
+# 10
+# PROBLEM:
+#     Kalau videoplayer window diresize (dengan cara drag), ukuran video
+#     tidak berubah/tidak mengikuti ukuran resize window. Jadinya tetap
+#     sesuai setting ukuran di kodingan. Dan kalau di-resize bisa2 muncul
+#     PROBLEM no.7
+# IDE:
+#     (PUZZLED)
+# HASIL:
+# ------------------------------------------------------------------------
+# 11
+# PROBLEM:
+#      Kalau sistem kelar ("STOP"), keterangan realtime volume ga balik ke 0
+# IDE:
+#      Ketika "STOP", labelnya ganti balik ke 0
+# HASIL:
+# ------------------------------------------------------------------------
+# 12
+# PROBLEM:
+#     Kadang ketika sistem udah start, loadcell telat kalibrasi.
+#     Jadi nilainya bisa ke minus.
+# IDE:
+# HASIL:
+# ------------------------------------------------------------------------
+    pass
+
+def PROBLEM_ARCHIEVED():
+    
 # ------------------------------------------------------------------------
 # 1 - DONE
 # PROBLEM:
@@ -466,47 +547,6 @@ def PROBLEM_LOG():
 # HASIL:
 #     BISA!
 # ------------------------------------------------------------------------
-# 5
-# PROBLEM:
-#     Kadang muncul error begini:
-#         Traceback (most recent call last):
-#         File "/home/bimanjaya/learner/TA/main/mainWindow.py", line 272, in run
-#         mass = struct.unpack('<f', data1)[0]
-#         struct.error: unpack requires a buffer of 4 bytes
-# IDE:
-#     (PUZZLED)
-# HASIL:
-# ------------------------------------------------------------------------
-# 6
-# PROBLEM:
-#     Kadang muncul error begini:
-#         Starting tareLoadcell_thread...
-#         Traceback (most recent call last):
-#         File "/home/bimanjaya/learner/TA/main/mainWindow.py", line 269, in run
-#             data = ser.read(9)
-#         File "/home/bimanjaya/.conda/envs/selebor/lib/python3.6/site-packages/serial/serialposix.py", line 596, in read
-#             'device reports readiness to read but returned no data '
-#         serial.serialutil.SerialException: device reports readiness to read but returned no data (device disconnected or multiple access on port?)
-#         Aborted (core dumped)
-# IDE:
-#     (PUZZLED)
-# HASIL:
-# ------------------------------------------------------------------------
-# 7
-# PROBLEM:
-#     Kadang muncul error begini kalau nge-resize window videoplayer, dan
-#     setelah selesai ngeklik 'STOP':
-#         ...
-#         QWidget::paintEngine: Should no longer be called
-#         QWidget::paintEngine: Should no longer be called
-#         QWidget::paintEngine: Should no longer be called
-#         QWidget::paintEngine: Should no longer be called
-#         Stopping start_thread_video...
-#         Segmentation fault (core dumped)
-# IDE:
-#     (PUZZLED)
-# HASIL:
-# ------------------------------------------------------------------------
 # 8 - DONE
 # PROBLEM:
 #     'KALIBRASI' error kalau /dev/ttyUSB0 tidak terdeteksi
@@ -519,31 +559,6 @@ def PROBLEM_LOG():
 #      sebelum 'KALIBRASI' detect dulu aja udah 'START' apa belum
 # HASIL:
 #      BISA!
-# ------------------------------------------------------------------------
-# 9
-# PROBLEM:
-#     Kalau videoplayer di close pake tanda silang window biasa, videoplayer
-#     ga nge-close, tapi malah nge-hide doang (suaranya masih ada)
-# IDE:
-#     (PUZZLED)
-# HASIL:
-# ------------------------------------------------------------------------
-# 10
-# PROBLEM:
-#     Kalau videoplayer window diresize (dengan cara drag), ukuran video
-#     tidak berubah/tidak mengikuti ukuran resize window. Jadinya tetap
-#     sesuai setting ukuran di kodingan. Dan kalau di-resize bisa2 muncul
-#     PROBLEM no.7
-# IDE:
-#     (PUZZLED)
-# HASIL:
-# ------------------------------------------------------------------------
-# 11
-# PROBLEM:
-#      Kalau sistem kelar ("STOP"), keterangan realtime volume ga balik ke 0
-# IDE:
-#      Ketika "STOP", labelnya ganti balik ke 0
-# HASIL:
 # ------------------------------------------------------------------------
 # 12 - DONE
 # PROBLEM:
@@ -560,8 +575,6 @@ def PROBLEM_LOG():
 # HASIL:
 #      BISA!
 # ------------------------------------------------------------------------
-#      
-
 
     pass
 
@@ -569,7 +582,10 @@ def FEATUREIDEA_LOG():
 
 # 1. Kasih keterangan sisa waktu berjalan
 # 2. Bisa custom nama file csv. Jadi ada popup dialog buat input string nama
-# 3. Kasih docstring di tiap fungsi / class
+# 3. Kasih docstring di tiap fungsi / class, biar dokumentasi enak
+# 4. Bikin pushButton yang bisa bikin window baru buat nampilin
+#    grafik yg lebih interaktif
+
     pass
 
 
