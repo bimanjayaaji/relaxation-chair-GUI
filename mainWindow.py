@@ -1,3 +1,4 @@
+from tracemalloc import stop
 from PyQt5 import QtCore, QtWidgets, QtGui, uic
 from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication
 from numpy import var
@@ -40,20 +41,22 @@ class threading(QtWidgets.QMainWindow):
         self.stopButton.clicked.connect(self.stop_worker)
         self.saveButton.clicked.connect(self.save_worker)
         self.tareButton.clicked.connect(self.tare_worker)
+        self.pijatButton_power.clicked.connect(self.pijatPower_worker)
 
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
         self.saveButton.setEnabled(False)
         self.tareButton.setEnabled(False)
 
-        self.thread1_state = 0
-        self.thread2_state = 0
-        self.thread3_state = 0
-        self.thread4_state = 0
-        self.thread5_state = 0
-        self.thread6_state = 0
-        self.thread7_state = 0
-        self.thread9_state = 0
+        self.thread1_state = 0 # tutorial
+        self.thread2_state = 0 # video
+        self.thread3_state = 0 # getLoadcell
+        self.thread4_state = 0 # massage
+        self.thread5_state = 0 # EEG
+        self.thread6_state = 0 # pump
+        self.thread7_state = 0 # timer
+        self.thread8_state = 0 # tare
+        self.thread9_state = 0 # pijatPower
 
         self.realtimeVol = 0
         self.csv_data = []
@@ -63,12 +66,6 @@ class threading(QtWidgets.QMainWindow):
         self.rec_oldtime = 0
         self.rec_newtime = 0
         self.rec_i = 0
-        self.time_arr = np.array([])
-        self.vol_arr = np.array([])
-
-    def list_changer(self):
-        self.time_arr = np.array(self.csv_data_time)
-        self.vol_arr = np.array(self.csv_data_vol)
     
     def show_vol_graph(self):
         self.MplWidget.canvas.axes.clear()
@@ -83,7 +80,6 @@ class threading(QtWidgets.QMainWindow):
 
     def start_worker(self):
 
-        # Bikin fungsi if buat ngecek adanya timer
         if self.timeSpinBox.value() > 0:
             
             if ((self.thread2_state and self.thread3_state and self.thread4_state 
@@ -195,7 +191,8 @@ class threading(QtWidgets.QMainWindow):
 
         self.saveLabel.setText('Ada data belum tersimpan')
         self.saveLabel.adjustSize()
-
+        self.realtimeASI.setText('0')
+        self.realtimeASI.adjustSize()
         self.show_vol_graph()
 
     def save_worker(self):
@@ -215,8 +212,15 @@ class threading(QtWidgets.QMainWindow):
         with file:   
             write = csv.writer(file)
             write.writerows(self.csv_data)
+        file.close()
         self.saveLabel.setText('Data baru sudah tersimpan')
         self.saveLabel.adjustSize()
+
+    def pijatPower_worker(self):
+        if self.thread3_state == 1:
+            self.thread[9] = pijatPower_thread(parent=None)
+            self.thread[9].start()
+            self.thread[9].any_signal9.connect(self.pijatPower_action)
 
     def tutorial_action(self,var1):
         if var1 == 1:
@@ -262,10 +266,7 @@ class threading(QtWidgets.QMainWindow):
     def tare_action(self,var3):
         pass
 
-    def stop_action(self,var4):
-        pass
-
-    def save_action(self,var5):
+    def pijatPower_action(self,var4):
         pass
 
 class tutorial_thread(QtCore.QThread):
@@ -274,10 +275,10 @@ class tutorial_thread(QtCore.QThread):
         super(tutorial_thread,self).__init__(parent)
         self.is_running = True
     def run(self):
-        print('starting tutorial_thread')
+        print('Starting tutorial_thread...')
         self.any_signal1.emit(1)
     def stop(self):
-        print('stopping tutorial_thread')
+        print('Stopping tutorial_thread...')
         self.is_running = False
         self.terminate()
 
@@ -286,11 +287,9 @@ class start_thread_video(QtCore.QThread):
     def __init__(self,parent=None):
         super(start_thread_video,self).__init__(parent)
         self.is_running = True
-        self.state = 0
     def run(self):
         print('Starting start_thread_video...')
         self.any_signal2.emit(1)
-        self.state = 1
     def stop(self):
         print('Stopping start_thread_video...')
         self.is_running = False
@@ -384,6 +383,21 @@ class tare_thread(QtCore.QThread):
     def stop(self):
         pass
 
+class pijatPower_thread(QtCore.QThread):
+    any_signal9 = QtCore.pyqtSignal(int)
+    def __init__(self, parent=None):
+        super(pijatPower_thread, self).__init__(parent)
+        self.is_running = True
+    def run(self):
+        print('Starting pijatPower_thread...')
+        ser = serial.Serial('/dev/ttyUSB0',57600,timeout=1.5)
+        ser.reset_input_buffer()
+        ser.write(b'r')
+        time.sleep(0.01)
+        self.any_signal9.emit(1)
+    def stop(self):
+        pass
+
 if __name__ == '__main__':
     app = QApplication(sys.argv)
     screen_res = app.desktop().screenGeometry()
@@ -415,6 +429,87 @@ def TODO_LOG():
     pass
 
 def PROBLEM_LOG():
+
+# ------------------------------------------------------------------------
+# 5
+# PROBLEM:
+#     Kadang muncul error begini:
+#         Traceback (most recent call last):
+#         File "/home/bimanjaya/learner/TA/main/mainWindow.py", line 272, in run
+#         mass = struct.unpack('<f', data1)[0]
+#         struct.error: unpack requires a buffer of 4 bytes
+# IDE:
+#     (PUZZLED)
+# HASIL:
+# ------------------------------------------------------------------------
+# 6
+# PROBLEM:
+#     Kadang muncul error begini:
+#         Starting tareLoadcell_thread...
+#         Traceback (most recent call last):
+#         File "/home/bimanjaya/learner/TA/main/mainWindow.py", line 269, in run
+#             data = ser.read(9)
+#         File "/home/bimanjaya/.conda/envs/selebor/lib/python3.6/site-packages/serial/serialposix.py", line 596, in read
+#             'device reports readiness to read but returned no data '
+#         serial.serialutil.SerialException: device reports readiness to read but returned no data (device disconnected or multiple access on port?)
+#         Aborted (core dumped)
+# IDE:
+#     (PUZZLED)
+# HASIL:
+# ------------------------------------------------------------------------
+# 7
+# PROBLEM:
+#     Kadang muncul error begini kalau nge-resize window videoplayer, dan
+#     setelah selesai ngeklik 'STOP':
+#         ...
+#         QWidget::paintEngine: Should no longer be called
+#         QWidget::paintEngine: Should no longer be called
+#         QWidget::paintEngine: Should no longer be called
+#         QWidget::paintEngine: Should no longer be called
+#         Stopping start_thread_video...
+#         Segmentation fault (core dumped)
+# IDE:
+#     (PUZZLED)
+# HASIL:
+# ------------------------------------------------------------------------
+# 9
+# PROBLEM:
+#     Kalau videoplayer di close pake tanda silang window biasa, videoplayer
+#     ga nge-close, tapi malah nge-hide doang (suaranya masih ada)
+# IDE:
+#     (PUZZLED)
+# HASIL:
+# ------------------------------------------------------------------------
+# 10
+# PROBLEM:
+#     Kalau videoplayer window diresize (dengan cara drag), ukuran video
+#     tidak berubah/tidak mengikuti ukuran resize window. Jadinya tetap
+#     sesuai setting ukuran di kodingan. Dan kalau di-resize bisa2 muncul
+#     PROBLEM no.7
+# IDE:
+#     (PUZZLED)
+# HASIL:
+# ------------------------------------------------------------------------
+# 11
+# PROBLEM:
+#      Kalau sistem kelar ("STOP"), keterangan realtime volume ga balik ke 0
+# IDE:
+#      Ketika "STOP", labelnya ganti balik ke 0
+# HASIL:
+# ------------------------------------------------------------------------
+# 12
+# PROBLEM:
+#     Ketika relay dimasukin ke sistem, ketika start (dimana ketika start relay 
+#     sistem akan mengirimkan 'r' ke arduino), relay ga jalan, dan untuk bisa akuisisi
+#     data load-cell, delaynya lama banget. bisa2 sampai 12 detik. tapi ketika sistem stop
+#     relay mau gerak.
+# IDE:
+# HASIL:
+# ------------------------------------------------------------------------
+
+    pass
+
+def PROBLEM_LOG_ARCHIEVED():
 
 # ------------------------------------------------------------------------
 # 1 - DONE
@@ -466,47 +561,6 @@ def PROBLEM_LOG():
 # HASIL:
 #     BISA!
 # ------------------------------------------------------------------------
-# 5
-# PROBLEM:
-#     Kadang muncul error begini:
-#         Traceback (most recent call last):
-#         File "/home/bimanjaya/learner/TA/main/mainWindow.py", line 272, in run
-#         mass = struct.unpack('<f', data1)[0]
-#         struct.error: unpack requires a buffer of 4 bytes
-# IDE:
-#     (PUZZLED)
-# HASIL:
-# ------------------------------------------------------------------------
-# 6
-# PROBLEM:
-#     Kadang muncul error begini:
-#         Starting tareLoadcell_thread...
-#         Traceback (most recent call last):
-#         File "/home/bimanjaya/learner/TA/main/mainWindow.py", line 269, in run
-#             data = ser.read(9)
-#         File "/home/bimanjaya/.conda/envs/selebor/lib/python3.6/site-packages/serial/serialposix.py", line 596, in read
-#             'device reports readiness to read but returned no data '
-#         serial.serialutil.SerialException: device reports readiness to read but returned no data (device disconnected or multiple access on port?)
-#         Aborted (core dumped)
-# IDE:
-#     (PUZZLED)
-# HASIL:
-# ------------------------------------------------------------------------
-# 7
-# PROBLEM:
-#     Kadang muncul error begini kalau nge-resize window videoplayer, dan
-#     setelah selesai ngeklik 'STOP':
-#         ...
-#         QWidget::paintEngine: Should no longer be called
-#         QWidget::paintEngine: Should no longer be called
-#         QWidget::paintEngine: Should no longer be called
-#         QWidget::paintEngine: Should no longer be called
-#         Stopping start_thread_video...
-#         Segmentation fault (core dumped)
-# IDE:
-#     (PUZZLED)
-# HASIL:
-# ------------------------------------------------------------------------
 # 8 - DONE
 # PROBLEM:
 #     'KALIBRASI' error kalau /dev/ttyUSB0 tidak terdeteksi
@@ -519,31 +573,6 @@ def PROBLEM_LOG():
 #      sebelum 'KALIBRASI' detect dulu aja udah 'START' apa belum
 # HASIL:
 #      BISA!
-# ------------------------------------------------------------------------
-# 9
-# PROBLEM:
-#     Kalau videoplayer di close pake tanda silang window biasa, videoplayer
-#     ga nge-close, tapi malah nge-hide doang (suaranya masih ada)
-# IDE:
-#     (PUZZLED)
-# HASIL:
-# ------------------------------------------------------------------------
-# 10
-# PROBLEM:
-#     Kalau videoplayer window diresize (dengan cara drag), ukuran video
-#     tidak berubah/tidak mengikuti ukuran resize window. Jadinya tetap
-#     sesuai setting ukuran di kodingan. Dan kalau di-resize bisa2 muncul
-#     PROBLEM no.7
-# IDE:
-#     (PUZZLED)
-# HASIL:
-# ------------------------------------------------------------------------
-# 11
-# PROBLEM:
-#      Kalau sistem kelar ("STOP"), keterangan realtime volume ga balik ke 0
-# IDE:
-#      Ketika "STOP", labelnya ganti balik ke 0
-# HASIL:
 # ------------------------------------------------------------------------
 # 12 - DONE
 # PROBLEM:
@@ -559,9 +588,6 @@ def PROBLEM_LOG():
 #      Nanti timer data_logger pake sistem (NEWTIME - OLDTIME) >= RATE
 # HASIL:
 #      BISA!
-# ------------------------------------------------------------------------
-#      
-
 
     pass
 

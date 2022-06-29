@@ -131,17 +131,17 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QLabel" name="label_3">
+    <widget class="QLabel" name="label_6">
      <property name="geometry">
       <rect>
-       <x>80</x>
+       <x>90</x>
        <y>100</y>
        <width>101</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>(Mode Pijatan)</string>
+      <string>(Mode Pompa)</string>
      </property>
     </widget>
    </widget>
@@ -299,7 +299,7 @@
     <property name="frameShadow">
      <enum>QFrame::Raised</enum>
     </property>
-    <widget class="QLabel" name="label_6">
+    <widget class="QLabel" name="label_3">
      <property name="geometry">
       <rect>
        <x>80</x>
@@ -309,7 +309,20 @@
       </rect>
      </property>
      <property name="text">
-      <string>(Mode Pompa)</string>
+      <string>(Mode Pijatan)</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pijatButton_power">
+     <property name="geometry">
+      <rect>
+       <x>90</x>
+       <y>130</y>
+       <width>89</width>
+       <height>25</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ON/OFF</string>
      </property>
     </widget>
    </widget>

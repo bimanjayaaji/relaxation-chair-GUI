@@ -26,7 +26,8 @@ union val {
 } val;
 
 void pin_setup(){
-  pinMode(77,OUTPUT);
+  pinMode(12,OUTPUT);
+  digitalWrite(12,HIGH);
 }
 
 void send_data(){
@@ -39,6 +40,7 @@ void send_data(){
 
 void setup() {
   Serial.begin(57600); 
+  pin_setup();
   delay(10);
   LoadCell.begin();
   
@@ -106,10 +108,16 @@ void loop() {
 
     if (inByte == 'l') digitalWrite(10, HIGH);
     if (inByte == 'o') digitalWrite(10, LOW);
+    if (inByte == 'r'){
+      delay(50);
+      digitalWrite(12,LOW);
+      delay(50);
+      digitalWrite(12,HIGH); 
+    }
   }
 
 //  delay(1000);
-//  digitalWrite(77, HIGH);
+//  digitalWrite(12, LOW);
 //  delay(1000);
-//  digitalWrite(77,LOW);
+//  digitalWrite(12,HIGH);
 }
