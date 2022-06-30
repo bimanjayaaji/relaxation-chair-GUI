@@ -27,7 +27,13 @@ union val {
 
 void pin_setup(){
   pinMode(12,OUTPUT);
+  pinMode(14,OUTPUT);
+  pinMode(16,OUTPUT);
+  pinMode(18,OUTPUT);
   digitalWrite(12,HIGH);
+  digitalWrite(14,HIGH);
+  digitalWrite(16,HIGH);
+  digitalWrite(18,HIGH);
 }
 
 void send_data(){
@@ -46,21 +52,19 @@ void setup() {
   
   float calibrationValue; 
   calibrationValue = 696.0; 
-#if defined(ESP8266)|| defined(ESP32)
+  #if defined(ESP8266)|| defined(ESP32)
 
-#endif
+  #endif
   EEPROM.get(calVal_eepromAdress, calibrationValue); 
 
   unsigned long stabilizingtime = 2000; 
   boolean _tare = true; 
   LoadCell.start(stabilizingtime, _tare);
   if (LoadCell.getTareTimeoutFlag()) {
-    //Serial.println("Timeout, check MCU>HX711 wiring and pin designations");
     while (1);
   }
   else {
     LoadCell.setCalFactor(calibrationValue);
-    //Serial.println("Startup is complete");
   }
 
   oldtime_com = millis();
@@ -68,56 +72,63 @@ void setup() {
 
 void loop() {
   static boolean newDataReady = 0;
-  const int serialPrintInterval = 0; //increase value to slow down serial print activity
+  const int serialPrintInterval = 0;
   tare = 0;
 
-  // check for new data/start next conversion:
   if (LoadCell.update()) newDataReady = true;
 
-  // get smoothed value from the dataset:
   if (newDataReady) {
     if (millis() > t + serialPrintInterval) {
       mass = LoadCell.getData();
       vol = mass*0.9998395;
-      //Serial.print("Mass : ");
-      //Serial.println(mass);
-//      Serial.print(" | ");
-//      Serial.print("Vol : ");
-//      Serial.println(vol);
       newDataReady = 0;
       t = millis();
 
       val.parameter.weight = mass;
       val.parameter.vol = vol;
-      //val.parameter.tare = tare;
       
       send_data();
     }
   }
   
-  // receive command from serial terminal, send 't' to initiate tare operation:
   if (Serial.available() > 0) {
     char inByte = Serial.read();
     if (inByte == 't') LoadCell.tareNoDelay();
-
-    // check if last tare operation is complete:
     if (LoadCell.getTareStatus() == true) {
-      //Serial.println("Tare complete");
       tare = 1;
     }
 
-    if (inByte == 'l') digitalWrite(10, HIGH);
-    if (inByte == 'o') digitalWrite(10, LOW);
-    if (inByte == 'r'){
+    if (inByte == 's'){
+      delay(50);
+      digitalWrite(12,LOW);
+      delay(50);
+      digitalWrite(12,HIGH);
+      delay(300);
+      delay(50);
+      digitalWrite(14,LOW);
+      delay(50);
+      digitalWrite(14,HIGH); 
+    }
+    
+    if (inByte == 'p'){
       delay(50);
       digitalWrite(12,LOW);
       delay(50);
       digitalWrite(12,HIGH); 
     }
-  }
 
-//  delay(1000);
-//  digitalWrite(12, LOW);
-//  delay(1000);
-//  digitalWrite(12,HIGH);
+    if (inByte == 'v'){
+      delay(50);
+      digitalWrite(16,LOW);
+      delay(50);
+      digitalWrite(16,HIGH); 
+    }
+
+    if (inByte == 'h'){
+      delay(50);
+      digitalWrite(18,LOW);
+      delay(50);
+      digitalWrite(18,HIGH); 
+    }
+  }
 }

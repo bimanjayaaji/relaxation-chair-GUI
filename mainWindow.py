@@ -39,12 +39,17 @@ class threading(QtWidgets.QMainWindow):
         self.stopButton.clicked.connect(self.stop_worker)
         self.saveButton.clicked.connect(self.save_worker)
         self.tareButton.clicked.connect(self.tare_worker)
-        self.pijatButton_power.clicked.connect(self.pijatPower_worker)
+        self.pijatButton.clicked.connect(self.pijat_worker)
+        self.vibrationButton.clicked.connect(self.vibration_worker)
+        self.heatButton.clicked.connect(self.heat_worker)
 
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
         self.saveButton.setEnabled(False)
         self.tareButton.setEnabled(False)
+        self.pijatButton.setEnabled(False)
+        self.vibrationButton.setEnabled(False)
+        self.heatButton.setEnabled(False)
 
         self.thread1_state = 0 # tutorial
         self.thread2_state = 0 # video
@@ -54,7 +59,9 @@ class threading(QtWidgets.QMainWindow):
         self.thread6_state = 0 # pump
         self.thread7_state = 0 # timer
         self.thread8_state = 0 # tare
-        self.thread9_state = 0 # pijatPower
+        self.thread9_state = 0 # pijat
+        self.thread10_state = 0 # vibration
+        self.thread11_state = 0 # heat
 
         self.realtimeVol = 0
         self.csv_data = []
@@ -89,6 +96,9 @@ class threading(QtWidgets.QMainWindow):
                     self.stopButton.setEnabled(True)
                     self.saveButton.setEnabled(False)
                     self.tareButton.setEnabled(True)
+                    self.pijatButton.setEnabled(True)
+                    self.vibrationButton.setEnabled(True)
+                    self.heatButton.setEnabled(True)
 
                     # START GET LOADCELL DATA
                     self.thread[3] = start_thread_getLoadcell(parent=None)
@@ -168,9 +178,12 @@ class threading(QtWidgets.QMainWindow):
         self.stopButton.setEnabled(False)
         self.tareButton.setEnabled(False)
         self.saveButton.setEnabled(True)
+        self.pijatButton.setEnabled(False)
+        self.vibrationButton.setEnabled(False)
+        self.heatButton.setEnabled(False)
 
         if self.thread9_state % 2 == 1:
-            self.pijatPower_worker()
+            self.pijat_worker()
 
         if self.thread2_state == 1:
             self.thread[2].stop()
@@ -218,12 +231,24 @@ class threading(QtWidgets.QMainWindow):
         self.saveLabel.setText('Data baru sudah tersimpan')
         self.saveLabel.adjustSize()
 
-    def pijatPower_worker(self):
+    def pijat_worker(self):
         if self.thread3_state == 1:
-            self.thread[9] = pijatPower_thread(parent=None)
-            self.thread[9].start()
-            self.thread[9].any_signal9.connect(self.pijatPower_action)
             self.thread9_state += 1
+            self.thread[9] = pijat_thread(self.thread9_state,parent=None)
+            self.thread[9].start()
+            self.thread[9].any_signal9.connect(self.pijat_action)
+
+    def vibration_worker(self):
+        if self.thread9_state % 2 == 1:
+            self.thread[10] = vibration_thread(parent=None)
+            self.thread[10].start()
+            self.thread[10].any_signal10.connect(self.vibration_action)
+
+    def heat_worker(self):
+        if self.thread9_state % 2 == 1:
+            self.thread[11] = heat_thread(parent=None)
+            self.thread[11].start()
+            self.thread[11].any_signal11.connect(self.heat_action)
 
     def tutorial_action(self,var1):
         if var1 == 1:
@@ -269,7 +294,13 @@ class threading(QtWidgets.QMainWindow):
     def tare_action(self,var3):
         pass
 
-    def pijatPower_action(self,var4):
+    def pijat_action(self,var4):
+        pass
+
+    def vibration_action(self,var5):
+        pass
+
+    def heat_action(self,var6):
         pass
 
 class tutorial_thread(QtCore.QThread):
@@ -386,18 +417,52 @@ class tare_thread(QtCore.QThread):
     def stop(self):
         pass
 
-class pijatPower_thread(QtCore.QThread):
+class pijat_thread(QtCore.QThread):
     any_signal9 = QtCore.pyqtSignal(int)
-    def __init__(self, parent=None):
-        super(pijatPower_thread, self).__init__(parent)
+    def __init__(self,state, parent=None):
+        super(pijat_thread, self).__init__(parent)
         self.is_running = True
+        self.state = state
     def run(self):
-        print('Starting pijatPower_thread...')
+        print('Starting pijat_thread...')
         ser = serial.Serial('/dev/ttyUSB0',57600,timeout=1.5)
         ser.reset_input_buffer()
-        ser.write(b'r')
+        if self.state % 2 == 1:
+            ser.write(b's')
+        if self.state % 2 == 0:
+            ser.write(b'p')
         time.sleep(0.01)
         self.any_signal9.emit(1)
+    def stop(self):
+        pass
+
+class vibration_thread(QtCore.QThread):
+    any_signal10 = QtCore.pyqtSignal(int)
+    def __init__(self, parent=None):
+        super(vibration_thread, self).__init__(parent)
+        self.is_running = True
+    def run(self):
+        print('Starting vibration_thread...')
+        ser = serial.Serial('/dev/ttyUSB0',57600,timeout=1.5)
+        ser.reset_input_buffer()
+        ser.write(b'v')
+        time.sleep(0.01)
+        self.any_signal10.emit(1)
+    def stop(self):
+        pass
+
+class heat_thread(QtCore.QThread):
+    any_signal11 = QtCore.pyqtSignal(int)
+    def __init__(self, parent=None):
+        super(heat_thread, self).__init__(parent)
+        self.is_running = True
+    def run(self):
+        print('Starting heat_thread...')
+        ser = serial.Serial('/dev/ttyUSB0',57600,timeout=1.5)
+        ser.reset_input_buffer()
+        ser.write(b'h')
+        time.sleep(0.01)
+        self.any_signal11.emit(1)
     def stop(self):
         pass
 
