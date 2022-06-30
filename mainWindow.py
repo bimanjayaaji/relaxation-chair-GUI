@@ -1,7 +1,5 @@
-from tracemalloc import stop
-from PyQt5 import QtCore, QtWidgets, QtGui, uic
 from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication
-from numpy import var
+from PyQt5 import QtCore, QtWidgets, QtGui, uic
 from multimediav1 import VideoPlayer
 import serial.tools.list_ports
 import numpy as np
@@ -142,6 +140,7 @@ class threading(QtWidgets.QMainWindow):
                     self.rec_i = 0
                     self.saveLabel.setText('Sistem sedang berjalan')
                     self.saveLabel.adjustSize()
+                    self.thread9_state = 0
 
                 else:
                     msg = QMessageBox()
@@ -169,6 +168,9 @@ class threading(QtWidgets.QMainWindow):
         self.stopButton.setEnabled(False)
         self.tareButton.setEnabled(False)
         self.saveButton.setEnabled(True)
+
+        if self.thread9_state % 2 == 1:
+            self.pijatPower_worker()
 
         if self.thread2_state == 1:
             self.thread[2].stop()
@@ -221,6 +223,7 @@ class threading(QtWidgets.QMainWindow):
             self.thread[9] = pijatPower_thread(parent=None)
             self.thread[9].start()
             self.thread[9].any_signal9.connect(self.pijatPower_action)
+            self.thread9_state += 1
 
     def tutorial_action(self,var1):
         if var1 == 1:
