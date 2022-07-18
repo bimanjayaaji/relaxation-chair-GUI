@@ -134,14 +134,66 @@
     <widget class="QLabel" name="label_6">
      <property name="geometry">
       <rect>
-       <x>90</x>
-       <y>100</y>
-       <width>101</width>
+       <x>120</x>
+       <y>10</y>
+       <width>51</width>
        <height>17</height>
       </rect>
      </property>
      <property name="text">
-      <string>(Mode Pompa)</string>
+      <string>Pump</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pumpButton">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>40</y>
+       <width>121</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>ON/OFF</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pumpMode_Button">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>40</y>
+       <width>121</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Mode</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pumpUp_Button">
+     <property name="geometry">
+      <rect>
+       <x>10</x>
+       <y>130</y>
+       <width>121</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Up</string>
+     </property>
+    </widget>
+    <widget class="QPushButton" name="pumpDown_Button">
+     <property name="geometry">
+      <rect>
+       <x>140</x>
+       <y>130</y>
+       <width>121</width>
+       <height>81</height>
+      </rect>
+     </property>
+     <property name="text">
+      <string>Down</string>
      </property>
     </widget>
    </widget>

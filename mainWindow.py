@@ -42,6 +42,10 @@ class threading(QtWidgets.QMainWindow):
         self.pijatButton.clicked.connect(self.pijat_worker)
         self.vibrationButton.clicked.connect(self.vibration_worker)
         self.heatButton.clicked.connect(self.heat_worker)
+        self.pumpButton.clicked.connect(self.pump_worker)
+        self.pumpMode_Button.clicked.connect(self.pumpMode_worker)
+        self.pumpUp_Button.clicked.connect(self.pumpUp_worker)
+        self.pumpDown_Button.clicked.connect(self.pumpDown_worker)
 
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
@@ -50,6 +54,10 @@ class threading(QtWidgets.QMainWindow):
         self.pijatButton.setEnabled(False)
         self.vibrationButton.setEnabled(False)
         self.heatButton.setEnabled(False)
+        self.pumpButton.setEnabled(False)
+        self.pumpMode_Button.setEnabled(False)
+        self.pumpUp_Button.setEnabled(False)
+        self.pumpDown_Button.setEnabled(False)
 
         self.thread1_state = 0 # tutorial
         self.thread2_state = 0 # video
@@ -62,6 +70,10 @@ class threading(QtWidgets.QMainWindow):
         self.thread9_state = 0 # pijat
         self.thread10_state = 0 # vibration
         self.thread11_state = 0 # heat
+        self.thread12_state = 0 # pump
+        self.thread13_state = 0 # pumpMode
+        self.thread14_state = 0 # pumpUp
+        self.thread15_state = 0 # pumpDown
 
         self.realtimeVol = 0
         self.csv_data = []
@@ -72,6 +84,8 @@ class threading(QtWidgets.QMainWindow):
         self.rec_newtime = 0
         self.rec_i = 0
     
+### ------------------------- ###
+
     def show_vol_graph(self):
         self.MplWidget.canvas.axes.clear()
         self.MplWidget.canvas.axes.plot(self.csv_data_time, self.csv_data_vol)
@@ -82,6 +96,8 @@ class threading(QtWidgets.QMainWindow):
         self.thread[1].start()
         self.thread1_state = 1
         self.thread[1].any_signal1.connect(self.tutorial_action)
+
+### ------------------------- ###
 
     def start_worker(self):
 
@@ -99,6 +115,10 @@ class threading(QtWidgets.QMainWindow):
                     self.pijatButton.setEnabled(True)
                     self.vibrationButton.setEnabled(True)
                     self.heatButton.setEnabled(True)
+                    self.pumpButton.setEnabled(True)
+                    self.pumpMode_Button.setEnabled(True)
+                    self.pumpUp_Button.setEnabled(True)
+                    self.pumpDown_Button.setEnabled(True)
 
                     # START GET LOADCELL DATA
                     self.thread[3] = start_thread_getLoadcell(parent=None)
@@ -184,6 +204,8 @@ class threading(QtWidgets.QMainWindow):
 
         if self.thread9_state % 2 == 1:
             self.pijat_worker()
+        if self.thread12_state % 2 == 1:
+            self.pump_worker()
 
         if self.thread2_state == 1:
             self.thread[2].stop()
@@ -250,6 +272,33 @@ class threading(QtWidgets.QMainWindow):
             self.thread[11].start()
             self.thread[11].any_signal11.connect(self.heat_action)
 
+    def pump_worker(self):
+        if self.thread3_state == 1:
+            self.thread12_state += 1
+            self.thread[12] = pump_thread(self.thread12_state,parent=None)
+            self.thread[12].start()
+            self.thread[12].any_signal12.connect(self.pump_action)
+
+    def pumpMode_worker(self):
+        if self.thread12_state % 2 == 1:
+            self.thread[13] = pumpMode_thread(parent=None)
+            self.thread[13].start()
+            self.thread[13].any_signal13.connect(self.pumpMode_action)
+
+    def pumpUp_worker(self):
+        if self.thread12_state % 2 == 1:
+            self.thread[14] = pumpUp_thread(parent=None)
+            self.thread[14].start()
+            self.thread[14].any_signal14.connect(self.pumpUp_action)
+
+    def pumpDown_worker(self):
+        if self.thread12_state % 2 == 1:
+            self.thread[15] = pumpDown_thread(parent=None)
+            self.thread[15].start()
+            self.thread[15].any_signal15.connect(self.pumpDown_action)
+
+### ------------------------- ###
+
     def tutorial_action(self,var1):
         if var1 == 1:
             msg = QMessageBox()
@@ -302,6 +351,20 @@ class threading(QtWidgets.QMainWindow):
 
     def heat_action(self,var6):
         pass
+
+    def pump_action(self,var7):
+        pass
+
+    def pumpMode_action(self,var8):
+        pass
+
+    def pumpUp_action(self,var9):
+        pass
+
+    def pumpDown_action(Self,var10):
+        pass
+
+### ------------------------- ###
 
 class tutorial_thread(QtCore.QThread):
     any_signal1 = QtCore.pyqtSignal(int)
@@ -463,6 +526,67 @@ class heat_thread(QtCore.QThread):
         ser.write(b'h')
         time.sleep(0.01)
         self.any_signal11.emit(1)
+    def stop(self):
+        pass
+
+class pump_thread(QtCore.QThread):
+    any_signal12 = QtCore.pyqtSignal(int)
+    def __init__(self,state, parent=None):
+        super(pump_thread, self).__init__(parent)
+        self.is_running = True
+        self.state = state
+    def run(self):
+        print('Starting pump_thread...')
+        ser = serial.Serial('/dev/ttyUSB0',57600,timeout=1.5)
+        ser.reset_input_buffer()
+        ser.write(b'n') 
+        time.sleep(0.01)
+        self.any_signal12.emit(1)
+    def stop(self):
+        pass
+
+class pumpMode_thread(QtCore.QThread):
+    any_signal13 = QtCore.pyqtSignal(int)
+    def __init__(self,parent=None):
+        super(pumpMode_thread, self).__init__(parent)
+        self.is_running = True
+    def run(self):
+        print('Starting pumpMode_thread...')
+        ser = serial.Serial('/dev/ttyUSB0',57600,timeout=1.5)
+        ser.reset_input_buffer()
+        ser.write(b'm') 
+        time.sleep(0.01)
+        self.any_signal13.emit(1)
+    def stop(self):
+        pass
+
+class pumpUp_thread(QtCore.QThread):
+    any_signal14 = QtCore.pyqtSignal(int)
+    def __init__(self,parent=None):
+        super(pumpUp_thread, self).__init__(parent)
+        self.is_running = True
+    def run(self):
+        print('Starting pumpUp_thread...')
+        ser = serial.Serial('/dev/ttyUSB0',57600,timeout=1.5)
+        ser.reset_input_buffer()
+        ser.write(b'u') 
+        time.sleep(0.01)
+        self.any_signal14.emit(1)
+    def stop(self):
+        pass
+
+class pumpDown_thread(QtCore.QThread):
+    any_signal15 = QtCore.pyqtSignal(int)
+    def __init__(self,parent=None):
+        super(pumpDown_thread, self).__init__(parent)
+        self.is_running = True
+    def run(self):
+        print('Starting pumpDown_thread...')
+        ser = serial.Serial('/dev/ttyUSB0',57600,timeout=1.5)
+        ser.reset_input_buffer()
+        ser.write(b'd') 
+        time.sleep(0.01)
+        self.any_signal15.emit(1)
     def stop(self):
         pass
 

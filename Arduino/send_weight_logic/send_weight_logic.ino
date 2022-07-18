@@ -16,6 +16,10 @@ unsigned long oldtime_com = 0;
 float mass = 0, vol = 0;
 int tare = 0;
 int led_state = 0;
+int x;
+
+int pijatPower = 15, vibration = 13, heat = 17, timer = 19;
+int pumpPower = 21, pumpMode = 23, pumpDown = 25, pumpUp = 27;
 
 union val {
   struct parameter {
@@ -26,14 +30,10 @@ union val {
 } val;
 
 void pin_setup(){
-  pinMode(12,OUTPUT);
-  pinMode(14,OUTPUT);
-  pinMode(16,OUTPUT);
-  pinMode(18,OUTPUT);
-  digitalWrite(12,HIGH);
-  digitalWrite(14,HIGH);
-  digitalWrite(16,HIGH);
-  digitalWrite(18,HIGH);
+  for(x=13;x<=27;x=x+2){
+    pinMode(x,OUTPUT);
+    digitalWrite(x,HIGH);
+  }
 }
 
 void send_data(){
@@ -45,7 +45,7 @@ void send_data(){
 }
 
 void setup() {
-  Serial.begin(57600); 
+  Serial.begin(57600);
   pin_setup();
   delay(10);
   LoadCell.begin();
@@ -93,42 +93,71 @@ void loop() {
   
   if (Serial.available() > 0) {
     char inByte = Serial.read();
-    if (inByte == 't') LoadCell.tareNoDelay();
+    if (inByte == 't') LoadCell.tareNoDelay(); // TARE
     if (LoadCell.getTareStatus() == true) {
       tare = 1;
     }
 
-    if (inByte == 's'){
-      delay(50);
-      digitalWrite(12,LOW);
-      delay(50);
-      digitalWrite(12,HIGH);
+    if (inByte == 's'){ // First Start
       delay(300);
-      delay(50);
-      digitalWrite(14,LOW);
-      delay(50);
-      digitalWrite(14,HIGH); 
+      digitalWrite(pijatPower,LOW); // Pijat Power
+      delay(300);
+      digitalWrite(pijatPower,HIGH);
+      delay(300);
+      delay(300);
+      digitalWrite(timer,LOW); // Timer
+      delay(300);
+      digitalWrite(timer,HIGH); 
     }
     
-    if (inByte == 'p'){
-      delay(50);
-      digitalWrite(12,LOW);
-      delay(50);
-      digitalWrite(12,HIGH); 
+    if (inByte == 'p'){ // Pijat Power
+      delay(300);
+      digitalWrite(pijatPower,LOW);
+      delay(300);
+      digitalWrite(pijatPower,HIGH); 
     }
 
-    if (inByte == 'v'){
-      delay(50);
-      digitalWrite(16,LOW);
-      delay(50);
-      digitalWrite(16,HIGH); 
+    if (inByte == 'v'){ // Vibration
+      delay(300);
+      digitalWrite(vibration,LOW);
+      delay(300);
+      digitalWrite(vibration,HIGH); 
     }
 
-    if (inByte == 'h'){
-      delay(50);
-      digitalWrite(18,LOW);
-      delay(50);
-      digitalWrite(18,HIGH); 
+    if (inByte == 'h'){ // Heat
+      delay(300);
+      digitalWrite(heat,LOW);
+      delay(300);
+      digitalWrite(heat,HIGH); 
     }
+
+    if (inByte == 'n'){ // Pump Power
+      delay(100);
+      digitalWrite(pumpPower,LOW);
+      delay(100);
+      digitalWrite(pumpPower,HIGH); 
+    }
+
+    if (inByte == 'm'){ // Pump Mode
+      delay(100);
+      digitalWrite(pumpMode,LOW);
+      delay(100);
+      digitalWrite(pumpMode,HIGH); 
+    }
+
+    if (inByte == 'd'){ // Pump Down
+      delay(100);
+      digitalWrite(pumpDown,LOW);
+      delay(100);
+      digitalWrite(pumpDown,HIGH); 
+    }
+
+    if (inByte == 'u'){ // Pump Up
+      delay(100);
+      digitalWrite(pumpUp,LOW);
+      delay(100);
+      digitalWrite(pumpUp,HIGH); 
+    }
+    
   }
 }
