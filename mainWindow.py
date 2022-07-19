@@ -31,7 +31,7 @@ def date_now():
 class threading(QtWidgets.QMainWindow):
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
-        self.ui = uic.loadUi('/home/bimanjaya/learner/TA/relaxation-chair-GUI/sistem-kursi-relaksasi.ui',self)
+        self.ui = uic.loadUi('/home/bimanjaya/learner/TA/relaxation-chair-GUI/sistem-kursi-relaksasi-v2.ui',self)
 
         self.thread = {}
         self.tutorialButton.clicked.connect(self.tutorial_worker)
@@ -46,6 +46,7 @@ class threading(QtWidgets.QMainWindow):
         self.pumpMode_Button.clicked.connect(self.pumpMode_worker)
         self.pumpUp_Button.clicked.connect(self.pumpUp_worker)
         self.pumpDown_Button.clicked.connect(self.pumpDown_worker)
+        self.modeBox.activated.connect(self.choosing_mode)
 
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
@@ -83,6 +84,10 @@ class threading(QtWidgets.QMainWindow):
         self.rec_oldtime = 0
         self.rec_newtime = 0
         self.rec_i = 0
+        self.x = ''
+        self.volumeTarget = 0
+        
+        self.choosing_mode()
     
 ### ------------------------- ###
 
@@ -91,100 +96,214 @@ class threading(QtWidgets.QMainWindow):
         self.MplWidget.canvas.axes.plot(self.csv_data_time, self.csv_data_vol)
         self.MplWidget.canvas.draw()
 
+    def choosing_mode(self):
+        self.x = str(self.modeBox.currentText())
+        if self.x == 'Timer':
+            self.timeSpinBox.setDisabled(False)
+            self.volumeSpinBox.setDisabled(True)
+        else:
+            self.timeSpinBox.setDisabled(True)
+            self.volumeSpinBox.setDisabled(False)    
+
+    def volume_mode(self):
+        if self.x == 'Volume':
+            if self.realtimeVol >= self.volumeTarget:
+                self.stop_worker()
+
+### ------------------------- ###
+
     def tutorial_worker(self):
         self.thread[1] = tutorial_thread(parent=None)
         self.thread[1].start()
         self.thread1_state = 1
         self.thread[1].any_signal1.connect(self.tutorial_action)
 
-### ------------------------- ###
-
     def start_worker(self):
 
-        if self.timeSpinBox.value() > 0:
-            
-            if ((self.thread2_state and self.thread3_state and self.thread4_state 
-            and self.thread5_state and self.thread6_state and self.thread7_state) == 0):
+        if self.x == 'Timer':
 
-                if serial_checker() == '/dev/ttyUSB0':
+            if self.timeSpinBox.value() > 0:
+                
+                if ((self.thread2_state and self.thread3_state and self.thread4_state 
+                and self.thread5_state and self.thread6_state and self.thread7_state) == 0):
 
-                    self.startButton.setEnabled(False)
-                    self.stopButton.setEnabled(True)
-                    self.saveButton.setEnabled(False)
-                    self.tareButton.setEnabled(True)
-                    self.pijatButton.setEnabled(True)
-                    self.vibrationButton.setEnabled(True)
-                    self.heatButton.setEnabled(True)
-                    self.pumpButton.setEnabled(True)
-                    self.pumpMode_Button.setEnabled(True)
-                    self.pumpUp_Button.setEnabled(True)
-                    self.pumpDown_Button.setEnabled(True)
+                    if serial_checker() == '/dev/ttyUSB0':
 
-                    # START GET LOADCELL DATA
-                    self.thread[3] = start_thread_getLoadcell(parent=None)
-                    self.thread[3].start()
-                    self.thread[3].any_signal3.connect(self.start_action_getLoadcell)
-                    self.thread3_state = 1
-                    time.sleep(0.2)
+                        self.startButton.setEnabled(False)
+                        self.stopButton.setEnabled(True)
+                        self.saveButton.setEnabled(False)
+                        self.tareButton.setEnabled(True)
+                        self.pijatButton.setEnabled(True)
+                        self.vibrationButton.setEnabled(True)
+                        self.heatButton.setEnabled(True)
+                        self.pumpButton.setEnabled(True)
+                        self.pumpMode_Button.setEnabled(True)
+                        self.pumpUp_Button.setEnabled(True)
+                        self.pumpDown_Button.setEnabled(True)
 
-                    # START VIDEO
-                    self.thread[2] = start_thread_video(parent=None)
-                    self.thread[2].start()
-                    self.thread[2].any_signal2.connect(self.start_action_video)
-                    self.thread2_state = 1
-                    time.sleep(0.2)
+                        # START GET LOADCELL DATA
+                        self.thread[3] = start_thread_getLoadcell(parent=None)
+                        self.thread[3].start()
+                        self.thread[3].any_signal3.connect(self.start_action_getLoadcell)
+                        self.thread3_state = 1
+                        time.sleep(0.2)
+
+                        # START VIDEO
+                        self.thread[2] = start_thread_video(parent=None)
+                        self.thread[2].start()
+                        self.thread[2].any_signal2.connect(self.start_action_video)
+                        self.thread2_state = 1
+                        time.sleep(0.2)
+                            
+                        # START MASSAGE COMMAND
+                        self.thread[4] = start_thread_massage(parent=None)
+                        self.thread[4].start()
+                        self.thread[4].any_signal4.connect(self.start_action_massage)
+                        self.thread4_state = 1
+                        time.sleep(0.2)
+
+                        # START GET EEG DATA
+                        self.thread[5] = start_thread_EEG(parent=None)
+                        self.thread[5].start()
+                        self.thread[5].any_signal5.connect(self.start_action_EEG)
+                        self.thread5_state = 1
+                        time.sleep(0.2)
+
+                        # START PUMP COMMAND
+                        self.thread[6] = start_thread_pump(parent=None)
+                        self.thread[6].start()
+                        self.thread[6].any_signal6.connect(self.start_action_pump)
+                        self.thread6_state = 1
+                        time.sleep(0.2)
+
+                        # if self.x == 'Timer':
+                        #     if self.timeSpinBox.value() > 0:
                         
-                    # START MASSAGE COMMAND
-                    self.thread[4] = start_thread_massage(parent=None)
-                    self.thread[4].start()
-                    self.thread[4].any_signal4.connect(self.start_action_massage)
-                    self.thread4_state = 1
-                    time.sleep(0.2)
+                        # START TIMER
+                        self.thread[7] = start_thread_timer(self.timeSpinBox.value(),parent=None)
+                        self.thread[7].start()
+                        self.thread[7].any_signal7.connect(self.start_action_timer)
+                        self.thread7_state = 1
+                        time.sleep(0.2)
+                        
+                        # else:
+                        #     self.volumeTarget = self.volumeSpinBox.value()
 
-                    # START GET EEG DATA
-                    self.thread[5] = start_thread_EEG(parent=None)
-                    self.thread[5].start()
-                    self.thread[5].any_signal5.connect(self.start_action_EEG)
-                    self.thread5_state = 1
-                    time.sleep(0.2)
+                        self.csv_data = []
+                        self.csv_data_time = []
+                        self.csv_data_vol = []
+                        self.rec_oldtime = time.time()
+                        self.rec_newtime = self.rec_oldtime
+                        self.rec_i = 0
+                        self.saveLabel.setText('Sistem sedang berjalan')
+                        self.saveLabel.adjustSize()
+                        self.thread9_state = 0
 
-                    # START PUMP COMMAND
-                    self.thread[6] = start_thread_pump(parent=None)
-                    self.thread[6].start()
-                    self.thread[6].any_signal6.connect(self.start_action_pump)
-                    self.thread6_state = 1
-                    time.sleep(0.2)
+                    else:
+                        msg = QMessageBox()
+                        msg.setWindowTitle('PERINGATAN')
+                        msg.setText('Mikrokontroller tidak terdeteksi')
+                        msg.setIcon(QMessageBox.Warning) # WARNING SIGN ICON
+                        x = msg.exec_()
 
-                    # START TIMER
-                    self.thread[7] = start_thread_timer(self.timeSpinBox.value(),parent=None)
-                    self.thread[7].start()
-                    self.thread[7].any_signal7.connect(self.start_action_timer)
-                    self.thread7_state = 1
-                    time.sleep(0.2)
-
-                    self.csv_data = []
-                    self.csv_data_time = []
-                    self.csv_data_vol = []
-                    self.rec_oldtime = time.time()
-                    self.rec_newtime = self.rec_oldtime
-                    self.rec_i = 0
-                    self.saveLabel.setText('Sistem sedang berjalan')
-                    self.saveLabel.adjustSize()
-                    self.thread9_state = 0
-
-                else:
-                    msg = QMessageBox()
-                    msg.setWindowTitle('PERINGATAN')
-                    msg.setText('Mikrokontroller tidak terdeteksi')
-                    msg.setIcon(QMessageBox.Warning) # WARNING SIGN ICON
-                    x = msg.exec_()
+            else:
+                msg = QMessageBox()
+                msg.setWindowTitle('PERINGATAN')
+                msg.setText('Atur timer dengan rentang 1-30 (menit)')
+                msg.setIcon(QMessageBox.Warning) # WARNING SIGN ICON
+                x = msg.exec_()
 
         else:
-            msg = QMessageBox()
-            msg.setWindowTitle('PERINGATAN')
-            msg.setText('Atur timer dengan rentang 1-30 (menit)')
-            msg.setIcon(QMessageBox.Warning) # WARNING SIGN ICON
-            x = msg.exec_()
+            if self.volumeSpinBox.value() > 0:
+                self.volumeTarget = self.volumeSpinBox.value()
+                if ((self.thread2_state and self.thread3_state and self.thread4_state 
+                    and self.thread5_state and self.thread6_state and self.thread7_state) == 0):
+
+                        if serial_checker() == '/dev/ttyUSB0':
+
+                            self.startButton.setEnabled(False)
+                            self.stopButton.setEnabled(True)
+                            self.saveButton.setEnabled(False)
+                            self.tareButton.setEnabled(True)
+                            self.pijatButton.setEnabled(True)
+                            self.vibrationButton.setEnabled(True)
+                            self.heatButton.setEnabled(True)
+                            self.pumpButton.setEnabled(True)
+                            self.pumpMode_Button.setEnabled(True)
+                            self.pumpUp_Button.setEnabled(True)
+                            self.pumpDown_Button.setEnabled(True)
+
+                            # START GET LOADCELL DATA
+                            self.thread[3] = start_thread_getLoadcell(parent=None)
+                            self.thread[3].start()
+                            self.thread[3].any_signal3.connect(self.start_action_getLoadcell)
+                            self.thread3_state = 1
+                            time.sleep(0.2)
+
+                            # START VIDEO
+                            self.thread[2] = start_thread_video(parent=None)
+                            self.thread[2].start()
+                            self.thread[2].any_signal2.connect(self.start_action_video)
+                            self.thread2_state = 1
+                            time.sleep(0.2)
+                                
+                            # START MASSAGE COMMAND
+                            self.thread[4] = start_thread_massage(parent=None)
+                            self.thread[4].start()
+                            self.thread[4].any_signal4.connect(self.start_action_massage)
+                            self.thread4_state = 1
+                            time.sleep(0.2)
+
+                            # START GET EEG DATA
+                            self.thread[5] = start_thread_EEG(parent=None)
+                            self.thread[5].start()
+                            self.thread[5].any_signal5.connect(self.start_action_EEG)
+                            self.thread5_state = 1
+                            time.sleep(0.2)
+
+                            # START PUMP COMMAND
+                            self.thread[6] = start_thread_pump(parent=None)
+                            self.thread[6].start()
+                            self.thread[6].any_signal6.connect(self.start_action_pump)
+                            self.thread6_state = 1
+                            time.sleep(0.2)
+
+                            # if self.x == 'Timer':
+                            #     if self.timeSpinBox.value() > 0:
+                            
+                            # # START TIMER
+                            # self.thread[7] = start_thread_timer(self.timeSpinBox.value(),parent=None)
+                            # self.thread[7].start()
+                            # self.thread[7].any_signal7.connect(self.start_action_timer)
+                            # self.thread7_state = 1
+                            # time.sleep(0.2)
+                            
+                            # else:
+                            #     self.volumeTarget = self.volumeSpinBox.value()
+
+                            self.csv_data = []
+                            self.csv_data_time = []
+                            self.csv_data_vol = []
+                            self.rec_oldtime = time.time()
+                            self.rec_newtime = self.rec_oldtime
+                            self.rec_i = 0
+                            self.saveLabel.setText('Sistem sedang berjalan')
+                            self.saveLabel.adjustSize()
+                            self.thread9_state = 0
+
+                        else:
+                            msg = QMessageBox()
+                            msg.setWindowTitle('PERINGATAN')
+                            msg.setText('Mikrokontroller tidak terdeteksi')
+                            msg.setIcon(QMessageBox.Warning) # WARNING SIGN ICON
+                            x = msg.exec_()
+            else:
+                msg = QMessageBox()
+                msg.setWindowTitle('PERINGATAN')
+                msg.setText('Atur volume dengan maksimal 150 (ml)')
+                msg.setIcon(QMessageBox.Warning) # WARNING SIGN ICON
+                x = msg.exec_()
+
 
     def tare_worker(self):
         if self.thread3_state == 1:
@@ -327,6 +446,7 @@ class threading(QtWidgets.QMainWindow):
             self.csv_data_time.append(time_now())
             self.csv_data_vol.append(var2_1)
             self.rec_oldtime = self.rec_newtime
+        self.volume_mode()
 
     def start_action_massage(self,var2_2):
         print(var2_2)

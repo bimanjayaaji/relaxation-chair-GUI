@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>799</width>
-    <height>597</height>
+    <width>873</width>
+    <height>722</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -65,8 +65,8 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>120</y>
-      <width>91</width>
+      <y>160</y>
+      <width>101</width>
       <height>41</height>
      </rect>
     </property>
@@ -76,13 +76,16 @@
       <verstretch>0</verstretch>
      </sizepolicy>
     </property>
+    <property name="maximum">
+     <number>60</number>
+    </property>
    </widget>
    <widget class="QPushButton" name="startButton">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>100</y>
-      <width>111</width>
+      <x>10</x>
+      <y>220</y>
+      <width>221</width>
       <height>31</height>
      </rect>
     </property>
@@ -93,8 +96,8 @@
    <widget class="QPushButton" name="saveButton">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>200</y>
+      <x>340</x>
+      <y>650</y>
       <width>221</width>
       <height>31</height>
      </rect>
@@ -106,9 +109,9 @@
    <widget class="QPushButton" name="stopButton">
     <property name="geometry">
      <rect>
-      <x>120</x>
-      <y>140</y>
-      <width>111</width>
+      <x>10</x>
+      <y>260</y>
+      <width>221</width>
       <height>31</height>
      </rect>
     </property>
@@ -119,10 +122,10 @@
    <widget class="QFrame" name="frame">
     <property name="geometry">
      <rect>
-      <x>520</x>
+      <x>240</x>
       <y>10</y>
-      <width>271</width>
-      <height>221</height>
+      <width>311</width>
+      <height>281</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -134,7 +137,7 @@
     <widget class="QLabel" name="label_6">
      <property name="geometry">
       <rect>
-       <x>120</x>
+       <x>140</x>
        <y>10</y>
        <width>51</width>
        <height>17</height>
@@ -149,8 +152,8 @@
       <rect>
        <x>10</x>
        <y>40</y>
-       <width>121</width>
-       <height>81</height>
+       <width>141</width>
+       <height>111</height>
       </rect>
      </property>
      <property name="text">
@@ -160,10 +163,10 @@
     <widget class="QPushButton" name="pumpMode_Button">
      <property name="geometry">
       <rect>
-       <x>140</x>
+       <x>160</x>
        <y>40</y>
-       <width>121</width>
-       <height>81</height>
+       <width>141</width>
+       <height>111</height>
       </rect>
      </property>
      <property name="text">
@@ -174,9 +177,9 @@
      <property name="geometry">
       <rect>
        <x>10</x>
-       <y>130</y>
-       <width>121</width>
-       <height>81</height>
+       <y>160</y>
+       <width>141</width>
+       <height>111</height>
       </rect>
      </property>
      <property name="text">
@@ -186,10 +189,10 @@
     <widget class="QPushButton" name="pumpDown_Button">
      <property name="geometry">
       <rect>
-       <x>140</x>
-       <y>130</y>
-       <width>121</width>
-       <height>81</height>
+       <x>160</x>
+       <y>160</y>
+       <width>141</width>
+       <height>111</height>
       </rect>
      </property>
      <property name="text">
@@ -201,8 +204,8 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>240</y>
-      <width>381</width>
+      <y>300</y>
+      <width>421</width>
       <height>311</height>
      </rect>
     </property>
@@ -258,9 +261,9 @@
    <widget class="QFrame" name="frame_3">
     <property name="geometry">
      <rect>
-      <x>400</x>
-      <y>240</y>
-      <width>391</width>
+      <x>440</x>
+      <y>300</y>
+      <width>421</width>
       <height>311</height>
      </rect>
     </property>
@@ -339,10 +342,10 @@
    <widget class="QFrame" name="frame_6">
     <property name="geometry">
      <rect>
-      <x>240</x>
+      <x>560</x>
       <y>10</y>
-      <width>271</width>
-      <height>221</height>
+      <width>301</width>
+      <height>281</height>
      </rect>
     </property>
     <property name="frameShape">
@@ -369,7 +372,7 @@
       <rect>
        <x>10</x>
        <y>40</y>
-       <width>121</width>
+       <width>281</width>
        <height>81</height>
       </rect>
      </property>
@@ -380,10 +383,10 @@
     <widget class="QPushButton" name="vibrationButton">
      <property name="geometry">
       <rect>
-       <x>140</x>
-       <y>40</y>
-       <width>121</width>
-       <height>81</height>
+       <x>160</x>
+       <y>130</y>
+       <width>131</width>
+       <height>141</height>
       </rect>
      </property>
      <property name="text">
@@ -395,8 +398,8 @@
       <rect>
        <x>10</x>
        <y>130</y>
-       <width>121</width>
-       <height>81</height>
+       <width>141</width>
+       <height>141</height>
       </rect>
      </property>
      <property name="text">
@@ -408,7 +411,7 @@
     <property name="geometry">
      <rect>
       <x>30</x>
-      <y>100</y>
+      <y>140</y>
       <width>41</width>
       <height>17</height>
      </rect>
@@ -420,14 +423,79 @@
    <widget class="QLabel" name="saveLabel">
     <property name="geometry">
      <rect>
-      <x>10</x>
-      <y>180</y>
+      <x>340</x>
+      <y>630</y>
       <width>221</width>
       <height>17</height>
      </rect>
     </property>
     <property name="text">
      <string>Tidak ada data belum tersimpan</string>
+    </property>
+   </widget>
+   <widget class="QLabel" name="volumeLabel">
+    <property name="geometry">
+     <rect>
+      <x>150</x>
+      <y>140</y>
+      <width>81</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Volume</string>
+    </property>
+   </widget>
+   <widget class="QSpinBox" name="volumeSpinBox">
+    <property name="geometry">
+     <rect>
+      <x>130</x>
+      <y>160</y>
+      <width>101</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <property name="sizePolicy">
+     <sizepolicy hsizetype="Minimum" vsizetype="Fixed">
+      <horstretch>0</horstretch>
+      <verstretch>0</verstretch>
+     </sizepolicy>
+    </property>
+    <property name="maximum">
+     <number>150</number>
+    </property>
+   </widget>
+   <widget class="QComboBox" name="modeBox">
+    <property name="geometry">
+     <rect>
+      <x>80</x>
+      <y>90</y>
+      <width>151</width>
+      <height>41</height>
+     </rect>
+    </property>
+    <item>
+     <property name="text">
+      <string>Timer</string>
+     </property>
+    </item>
+    <item>
+     <property name="text">
+      <string>Volume</string>
+     </property>
+    </item>
+   </widget>
+   <widget class="QLabel" name="modeLabel">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>100</y>
+      <width>71</width>
+      <height>17</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>Mode :</string>
     </property>
    </widget>
    <zorder>frame</zorder>
@@ -443,13 +511,17 @@
    <zorder>frame_6</zorder>
    <zorder>timerLabel</zorder>
    <zorder>saveLabel</zorder>
+   <zorder>volumeLabel</zorder>
+   <zorder>volumeSpinBox</zorder>
+   <zorder>modeBox</zorder>
+   <zorder>modeLabel</zorder>
   </widget>
   <widget class="QMenuBar" name="menubar">
    <property name="geometry">
     <rect>
      <x>0</x>
      <y>0</y>
-     <width>799</width>
+     <width>873</width>
      <height>22</height>
     </rect>
    </property>
