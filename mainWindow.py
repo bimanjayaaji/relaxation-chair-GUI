@@ -1,6 +1,7 @@
 from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication
 from PyQt5 import QtCore, QtWidgets, QtGui, uic
 from multimediav1 import VideoPlayer
+import matplotlib.pyplot as plt
 import serial.tools.list_ports
 import numpy as np
 import datetime
@@ -94,6 +95,10 @@ class threading(QtWidgets.QMainWindow):
     def show_vol_graph(self):
         self.MplWidget.canvas.axes.clear()
         self.MplWidget.canvas.axes.plot(self.csv_data_time, self.csv_data_vol)
+        # self.MplWidget.canvas.axes.set_xticklabels([])
+        # self.MplWidget.canvas.axes.pyplot.locator_params(axis='x', nbins=5)
+        xmin, xmax = self.MplWidget.canvas.axes.get_xlim()
+        self.MplWidget.canvas.axes.set_xticks(np.round(np.linspace(xmin, xmax, 5), 2))
         self.MplWidget.canvas.draw()
 
     def choosing_mode(self):
@@ -134,12 +139,17 @@ class threading(QtWidgets.QMainWindow):
                         self.saveButton.setEnabled(False)
                         self.tareButton.setEnabled(True)
                         self.pijatButton.setEnabled(True)
-                        self.vibrationButton.setEnabled(True)
-                        self.heatButton.setEnabled(True)
+                        self.vibrationButton.setEnabled(False)
+                        self.heatButton.setEnabled(False)
                         self.pumpButton.setEnabled(True)
-                        self.pumpMode_Button.setEnabled(True)
-                        self.pumpUp_Button.setEnabled(True)
-                        self.pumpDown_Button.setEnabled(True)
+                        self.pumpMode_Button.setEnabled(False)
+                        self.pumpUp_Button.setEnabled(False)
+                        self.pumpDown_Button.setEnabled(False)
+                        self.modeBox.setEnabled(False)
+                        self.timeSpinBox.setDisabled(True)
+                        self.volumeSpinBox.setDisabled(True)
+                        self.MplWidget.canvas.axes.clear()
+                        self.MplWidget.canvas.draw()
 
                         # START GET LOADCELL DATA
                         self.thread[3] = start_thread_getLoadcell(parent=None)
@@ -226,12 +236,17 @@ class threading(QtWidgets.QMainWindow):
                             self.saveButton.setEnabled(False)
                             self.tareButton.setEnabled(True)
                             self.pijatButton.setEnabled(True)
-                            self.vibrationButton.setEnabled(True)
-                            self.heatButton.setEnabled(True)
+                            self.vibrationButton.setEnabled(False)
+                            self.heatButton.setEnabled(False)
                             self.pumpButton.setEnabled(True)
-                            self.pumpMode_Button.setEnabled(True)
-                            self.pumpUp_Button.setEnabled(True)
-                            self.pumpDown_Button.setEnabled(True)
+                            self.pumpMode_Button.setEnabled(False)
+                            self.pumpUp_Button.setEnabled(False)
+                            self.pumpDown_Button.setEnabled(False)
+                            self.modeBox.setEnabled(False)
+                            self.timeSpinBox.setDisabled(True)
+                            self.volumeSpinBox.setDisabled(True)
+                            self.MplWidget.canvas.axes.clear()
+                            self.MplWidget.canvas.draw()
 
                             # START GET LOADCELL DATA
                             self.thread[3] = start_thread_getLoadcell(parent=None)
@@ -291,6 +306,9 @@ class threading(QtWidgets.QMainWindow):
                             self.saveLabel.adjustSize()
                             self.thread9_state = 0
 
+                            self.pump_worker()
+                            self.pumpButton.setEnabled(False)
+
                         else:
                             msg = QMessageBox()
                             msg.setWindowTitle('PERINGATAN')
@@ -303,7 +321,6 @@ class threading(QtWidgets.QMainWindow):
                 msg.setText('Atur volume dengan maksimal 150 (ml)')
                 msg.setIcon(QMessageBox.Warning) # WARNING SIGN ICON
                 x = msg.exec_()
-
 
     def tare_worker(self):
         if self.thread3_state == 1:
@@ -320,6 +337,12 @@ class threading(QtWidgets.QMainWindow):
         self.pijatButton.setEnabled(False)
         self.vibrationButton.setEnabled(False)
         self.heatButton.setEnabled(False)
+        self.pumpButton.setEnabled(False)
+        self.pumpMode_Button.setEnabled(False)
+        self.pumpUp_Button.setEnabled(False)
+        self.pumpDown_Button.setEnabled(False)
+        self.modeBox.setEnabled(True)
+        self.choosing_mode()
 
         if self.thread9_state % 2 == 1:
             self.pijat_worker()
@@ -446,7 +469,8 @@ class threading(QtWidgets.QMainWindow):
             self.csv_data_time.append(time_now())
             self.csv_data_vol.append(var2_1)
             self.rec_oldtime = self.rec_newtime
-        self.volume_mode()
+            self.volume_mode()
+        # self.volume_mode()
 
     def start_action_massage(self,var2_2):
         print(var2_2)
@@ -464,7 +488,12 @@ class threading(QtWidgets.QMainWindow):
         pass
 
     def pijat_action(self,var4):
-        pass
+        if var4 == 1:
+            self.vibrationButton.setEnabled(True)
+            self.heatButton.setEnabled(True)
+        else:
+            self.vibrationButton.setEnabled(False)
+            self.heatButton.setEnabled(False)
 
     def vibration_action(self,var5):
         pass
@@ -473,7 +502,15 @@ class threading(QtWidgets.QMainWindow):
         pass
 
     def pump_action(self,var7):
-        pass
+        print(var7)
+        if var7 == 1:
+            self.pumpMode_Button.setEnabled(True)
+            self.pumpUp_Button.setEnabled(True)
+            self.pumpDown_Button.setEnabled(True)
+        else:
+            self.pumpMode_Button.setEnabled(False)
+            self.pumpUp_Button.setEnabled(False)
+            self.pumpDown_Button.setEnabled(False)
 
     def pumpMode_action(self,var8):
         pass
@@ -612,10 +649,11 @@ class pijat_thread(QtCore.QThread):
         ser.reset_input_buffer()
         if self.state % 2 == 1:
             ser.write(b's')
+            self.any_signal9.emit(1)
         if self.state % 2 == 0:
             ser.write(b'p')
+            self.any_signal9.emit(0)
         time.sleep(0.01)
-        self.any_signal9.emit(1)
     def stop(self):
         pass
 
@@ -659,9 +697,13 @@ class pump_thread(QtCore.QThread):
         print('Starting pump_thread...')
         ser = serial.Serial('/dev/ttyUSB0',57600,timeout=1.5)
         ser.reset_input_buffer()
-        ser.write(b'n') 
+        ser.write(b'n')
+        if self.state % 2 == 1:
+            self.any_signal12.emit(1)
+        if self.state % 2 == 0:
+            self.any_signal12.emit(0) 
         time.sleep(0.01)
-        self.any_signal12.emit(1)
+        # self.any_signal12.emit(1)
     def stop(self):
         pass
 
