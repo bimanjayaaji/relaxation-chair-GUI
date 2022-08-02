@@ -86,7 +86,8 @@ void loop() {
 
       val.parameter.weight = mass;
       val.parameter.vol = vol;
-      
+
+      //Serial.println(vol);
       send_data();
     }
   }
