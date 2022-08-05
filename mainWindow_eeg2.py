@@ -145,6 +145,7 @@ class threading(QtWidgets.QMainWindow):
         self.thread13_state = 0 # pumpMode
         self.thread14_state = 0 # pumpUp
         self.thread15_state = 0 # pumpDown
+        self.thread16_state = 0 # eeg 2
 
         self.realtimeVol = 0
         self.eegData = 0.0
