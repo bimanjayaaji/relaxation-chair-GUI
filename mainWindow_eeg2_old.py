@@ -24,7 +24,6 @@ import csv
 
 eegRealtime = 0
 volRealtime = 0
-volRealtime_old = 0
 eegRealtime2 = 0
 csv_data_time = []
 csv_data_vol = []
@@ -33,16 +32,11 @@ csv_data_eeg = []
 def serial_checker():
     port_name = ''
     ports = serial.tools.list_ports.comports()
-    # for port,desc,hwid in sorted(ports)[1]:
-    #     port_name = port
-    #     port_desc = desc
-    #     port_hwid = hwid
-    # print(sorted(ports)[0][0])
-    # print(sorted(ports)[1][0])
-    # print(sorted(ports)[2][0])
-    # print(port_name)
-    # return port_name
-    return sorted(ports)[1][0]
+    for port,desc,hwid in sorted(ports):
+        port_name = port
+        port_desc = desc
+        port_hwid = hwid
+    return port_name
 
 def time_now():
     now = datetime.datetime.now().strftime("%H:%M:%S")
@@ -56,8 +50,7 @@ def date_now():
 def initialize_eeg():
     global loaded,params,board,keep_alive,sampling_rate,delay,eeg_channel1,eeg_channel2,eeg_channel3,eeg_channel4,master_board_id,nfft,eeg_channelss
 
-    loaded = load('/home/bimanjaya/learner/TA/brainflow/EEG-projects/src/model1.joblib')
-    # loaded = load('/home/san/Downloads/EEG-projects-backup-main/src/model1.joblib') 
+    loaded = load('/home/bimanjaya/learner/TA/brainflow/EEG-projects/src/model1.joblib') 
     delay = 5
 
     BoardShim.enable_board_logger()
@@ -88,7 +81,6 @@ class plotWindow(QtWidgets.QMainWindow):
         global csv_data_time,csv_data_eeg,csv_data_vol
         QtWidgets.QMainWindow.__init__(self)
         self.ui = uic.loadUi('/home/bimanjaya/learner/TA/relaxation-chair-GUI/plot.ui',self)
-        # self.ui = uic.loadUi('/home/san/Downloads/relaxation-chair-GUI-main/plot.ui',self)
 
         # mainWindow = threading()
 
@@ -108,7 +100,6 @@ class threading(QtWidgets.QMainWindow):
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
         self.ui = uic.loadUi('/home/bimanjaya/learner/TA/relaxation-chair-GUI/sistem-kursi-relaksasi-v6.ui',self)
-        # self.ui = uic.loadUi('/home/san/Downloads/relaxation-chair-GUI-main/sistem-kursi-relaksasi-v6.ui',self)
 
         self.thread = {}
         self.tutorialButton.clicked.connect(self.tutorial_worker)
@@ -155,7 +146,6 @@ class threading(QtWidgets.QMainWindow):
         self.thread14_state = 0 # pumpUp
         self.thread15_state = 0 # pumpDown
         self.thread16_state = 0 # eeg 2
-        self.thread17_state = 0 # batt
 
         self.realtimeVol = 0
         self.eegData = 0.0
@@ -173,8 +163,6 @@ class threading(QtWidgets.QMainWindow):
         self.choosing_mode()
 
         initialize_eeg()
-
-        self.batt_worker()
 
         board.prepare_session()
         board.start_stream()
@@ -237,7 +225,6 @@ class threading(QtWidgets.QMainWindow):
         self.modeBox.setEnabled(False)
         self.timeSpinBox.setDisabled(True)
         self.volumeSpinBox.setDisabled(True)
-        self.plotButton.setEnabled(False)
         # self.MplWidget.canvas.axes.clear()
         # self.MplWidget.canvas.draw()
         # self.MplWidget2.canvas.axes.clear()
@@ -406,9 +393,6 @@ class threading(QtWidgets.QMainWindow):
         if self.thread16_state == 1:
             self.thread[16].stop()
             self.thread16_state = 0
-        # if self.thread17_state == 1:
-        #     self.thread[17].stop()
-        #     self.thread17_state = 0
 
         self.saveLabel.setText('Ada data belum tersimpan')
         self.saveLabel.adjustSize()
@@ -490,13 +474,6 @@ class threading(QtWidgets.QMainWindow):
             self.thread[15] = pumpDown_thread(parent=None)
             self.thread[15].start()
             self.thread[15].any_signal15.connect(self.pumpDown_action)
-
-    def batt_worker(self):
-        self.thread[17] = start_thread_getBatt(parent=None)
-        self.thread[17].start()
-        self.thread[17].any_signal17.connect(self.start_action_getBatt)
-        self.thread17_state = 1
-        time.sleep(0.2)
 
 ### ------------------------- ###
 
@@ -587,11 +564,8 @@ class threading(QtWidgets.QMainWindow):
     def pumpUp_action(self,var9):
         pass
 
-    def pumpDown_action(self,var10):
+    def pumpDown_action(Self,var10):
         pass
-
-    def start_action_getBatt(self,var11):
-        self.battSOC.setText(str(var11))
 
 ### ------------------------- ###
 
@@ -628,7 +602,7 @@ class start_thread_getLoadcell(QtCore.QThread):
         self.is_running = True
     def run(self):
         print('Starting start_thread_getLoadcell...')
-        global volRealtime,volRealtime_old
+        global volRealtime
         mass = 0
         vol = 0
         ser = serial.Serial('/dev/ttyUSB0',57600,timeout=1.5)
@@ -643,10 +617,7 @@ class start_thread_getLoadcell(QtCore.QThread):
                 mass = struct.unpack('<f', data1)[0]
                 vol = struct.unpack('<f',data2)[0]
             time.sleep(0.01)
-            volRealtime = round(vol)
-            if volRealtime < volRealtime_old:
-                volRealtime = volRealtime_old
-            volRealtime_old = volRealtime
+            volRealtime = round(vol,2)
             # print(f'vol : {vol}')
             self.any_signal3.emit(vol)
     def stop(self):
@@ -810,7 +781,6 @@ class tare_thread(QtCore.QThread):
         super(tare_thread, self).__init__(parent)
         self.is_running = True
     def run(self):
-        global volRealtime,volRealtime_old
         print('Starting tareLoadcell_thread...')
         mass = 0
         vol = 0
@@ -818,8 +788,6 @@ class tare_thread(QtCore.QThread):
         ser.reset_input_buffer()
         ser.write(b't')
         time.sleep(0.01)
-        volRealtime_old = 0
-        volRealtime = 0 
         self.any_signal8.emit(vol)
     def stop(self):
         pass
@@ -938,30 +906,6 @@ class pumpDown_thread(QtCore.QThread):
         self.any_signal15.emit(1)
     def stop(self):
         pass
-
-class start_thread_getBatt(QtCore.QThread):
-    any_signal17 = QtCore.pyqtSignal(int)
-    def __init__(self,parent=None):
-        super(start_thread_getBatt,self).__init__(parent)
-        self.is_running = True
-    def run(self):
-        print('Starting start_thread_getBatt...')
-        soc = 0
-        ser = serial.Serial('/dev/ttyUSB1',57600,timeout=1.5)
-        ser.flush()
-        time.sleep(0.1)
-        while (True):
-            if ser.in_waiting > 0:
-                data = ser.read(5)
-                data1 = data[1:5]
-                soc = struct.unpack('<f', data1)[0]
-            time.sleep(0.01)
-            print(soc)
-            self.any_signal17.emit(soc)
-    def stop(self):
-        print('Stopping start_thread_getBatt...')
-        self.is_running = False
-        self.terminate()
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)

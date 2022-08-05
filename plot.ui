@@ -20,7 +20,7 @@
       <x>9</x>
       <y>39</y>
       <width>1001</width>
-      <height>231</height>
+      <height>211</height>
      </rect>
     </property>
    </widget>
@@ -34,16 +34,16 @@
      </rect>
     </property>
     <property name="text">
-     <string>Grafik Volume Terhadap Waktu</string>
+     <string>GRAFIK VOLUME TERHADAP WAKTU</string>
     </property>
    </widget>
    <widget class="MplWidget" name="MplWidget2" native="true">
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>310</y>
+      <y>290</y>
       <width>1001</width>
-      <height>231</height>
+      <height>211</height>
      </rect>
     </property>
    </widget>
@@ -51,13 +51,13 @@
     <property name="geometry">
      <rect>
       <x>400</x>
-      <y>280</y>
+      <y>260</y>
       <width>281</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>Grafik Relaksasi Terhadap Waktu</string>
+     <string>GRAFIK RELAKSASI TERHADAP WAKTU</string>
     </property>
    </widget>
   </widget>
