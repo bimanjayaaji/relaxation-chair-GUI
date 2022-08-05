@@ -1,5 +1,6 @@
 from brainflow.ml_model import MLModel, BrainFlowMetrics, BrainFlowClassifiers, BrainFlowModelParams
 from brainflow.data_filter import DataFilter, WindowOperations, DetrendOperations, FilterTypes
+from brainflow.data_filter import DataFilter, WindowOperations, DetrendOperations, FilterTypes
 from brainflow.board_shim import BoardShim, BrainFlowInputParams, LogLevels, BoardIds
 from sklearn.model_selection import train_test_split, cross_val_score
 from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication
@@ -21,9 +22,12 @@ import time
 import sys 
 import csv 
 
-volRealtime = 0
 eegRealtime = 0
+volRealtime = 0
 eegRealtime2 = 0
+csv_data_time = []
+csv_data_vol = []
+csv_data_eeg = []
 
 def serial_checker():
     port_name = ''
@@ -72,15 +76,30 @@ def initialize_eeg():
 
     keep_alive = True
 
-class variable_holder():
+class plotWindow(QtWidgets.QMainWindow):
     def __init__(self):
-        self.eegRealtime = 0
-        self.volRealtime = 0
+        global csv_data_time,csv_data_eeg,csv_data_vol
+        QtWidgets.QMainWindow.__init__(self)
+        self.ui = uic.loadUi('/home/bimanjaya/learner/TA/relaxation-chair-GUI/plot.ui',self)
+
+        # mainWindow = threading()
+
+        self.MplWidget.canvas.axes.clear()
+        self.MplWidget.canvas.axes.plot(csv_data_time, csv_data_vol)
+        xmin, xmax = self.MplWidget.canvas.axes.get_xlim()
+        self.MplWidget.canvas.axes.set_xticks(np.round(np.linspace(xmin, xmax, 5), 2))
+        self.MplWidget.canvas.draw()
+
+        self.MplWidget2.canvas.axes.clear()
+        self.MplWidget2.canvas.axes.plot(csv_data_time, csv_data_eeg)
+        xmin, xmax = self.MplWidget2.canvas.axes.get_xlim()
+        self.MplWidget2.canvas.axes.set_xticks(np.round(np.linspace(xmin, xmax, 5), 2))
+        self.MplWidget2.canvas.draw()
 
 class threading(QtWidgets.QMainWindow):
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
-        self.ui = uic.loadUi('/home/bimanjaya/learner/TA/relaxation-chair-GUI/sistem-kursi-relaksasi-v5.ui',self)
+        self.ui = uic.loadUi('/home/bimanjaya/learner/TA/relaxation-chair-GUI/sistem-kursi-relaksasi-v6.ui',self)
 
         self.thread = {}
         self.tutorialButton.clicked.connect(self.tutorial_worker)
@@ -96,6 +115,7 @@ class threading(QtWidgets.QMainWindow):
         self.pumpUp_Button.clicked.connect(self.pumpUp_worker)
         self.pumpDown_Button.clicked.connect(self.pumpDown_worker)
         self.modeBox.activated.connect(self.choosing_mode)
+        self.plotButton.clicked.connect(self.newWindow_plot)
 
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
@@ -108,6 +128,7 @@ class threading(QtWidgets.QMainWindow):
         self.pumpMode_Button.setEnabled(False)
         self.pumpUp_Button.setEnabled(False)
         self.pumpDown_Button.setEnabled(False)
+        self.plotButton.setEnabled(False)
 
         self.thread1_state = 0 # tutorial
         self.thread2_state = 0 # video
@@ -153,14 +174,12 @@ class threading(QtWidgets.QMainWindow):
         self.MplWidget.canvas.axes.plot(self.csv_data_time, self.csv_data_vol)
         xmin, xmax = self.MplWidget.canvas.axes.get_xlim()
         self.MplWidget.canvas.axes.set_xticks(np.round(np.linspace(xmin, xmax, 5), 2))
-        # self.MplWidget.canvas.axes.set_position([0.1,0.1,1,1])
         self.MplWidget.canvas.draw()
 
         self.MplWidget2.canvas.axes.clear()
         self.MplWidget2.canvas.axes.plot(self.csv_data_time, self.csv_data_eeg)
         xmin, xmax = self.MplWidget2.canvas.axes.get_xlim()
         self.MplWidget2.canvas.axes.set_xticks(np.round(np.linspace(xmin, xmax, 5), 2))
-        # self.MplWidget2.canvas.axes.set_position([0.1,0.1,1,1])
         self.MplWidget2.canvas.draw()
 
     def choosing_mode(self):
@@ -176,6 +195,10 @@ class threading(QtWidgets.QMainWindow):
         if self.x == 'Volume':
             if self.realtimeVol >= self.volumeTarget:
                 self.stop_worker()
+    
+    def newWindow_plot(self):
+        window2 = plotWindow()
+        window2.show()
 
 ### ------------------------- ###
 
@@ -201,10 +224,10 @@ class threading(QtWidgets.QMainWindow):
         self.modeBox.setEnabled(False)
         self.timeSpinBox.setDisabled(True)
         self.volumeSpinBox.setDisabled(True)
-        self.MplWidget.canvas.axes.clear()
-        self.MplWidget.canvas.draw()
-        self.MplWidget2.canvas.axes.clear()
-        self.MplWidget2.canvas.draw()
+        # self.MplWidget.canvas.axes.clear()
+        # self.MplWidget.canvas.draw()
+        # self.MplWidget2.canvas.axes.clear()
+        # self.MplWidget2.canvas.draw()
 
         # START GET LOADCELL DATA
         self.thread[3] = start_thread_getLoadcell(parent=None)
@@ -326,6 +349,7 @@ class threading(QtWidgets.QMainWindow):
             self.thread[8].any_signal8.connect(self.tare_action)
 
     def stop_worker(self):
+        global csv_data_time,csv_data_vol,csv_data_eeg
 
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
@@ -339,6 +363,7 @@ class threading(QtWidgets.QMainWindow):
         self.pumpUp_Button.setEnabled(False)
         self.pumpDown_Button.setEnabled(False)
         self.modeBox.setEnabled(True)
+        self.plotButton.setEnabled(True)
         self.choosing_mode()
 
         if self.thread9_state % 2 == 1:
@@ -372,7 +397,11 @@ class threading(QtWidgets.QMainWindow):
         self.saveLabel.adjustSize()
         self.realtimeASI.setText('0')
         self.realtimeASI.adjustSize()
-        self.show_vol_graph()
+        # self.show_vol_graph()
+
+        csv_data_time = self.csv_data_time
+        csv_data_vol = self.csv_data_vol
+        csv_data_eeg = self.csv_data_eeg
 
     def save_worker(self):
         for i in self.csv_data_time:
@@ -387,13 +416,13 @@ class threading(QtWidgets.QMainWindow):
             self.rec_i += 1
 
         print(self.csv_data)
-        file = open('/home/bimanjaya/learner/TA/relaxation-chair-GUI/data_logger/load_cell/'+date_now()+'_'+time_now()+'.csv', 'w', newline ='')
+        file = open('/home/san/load_cell/'+date_now()+'_'+time_now()+'.csv', 'w', newline ='')
         with file:
-            header = ['Waktu', 'Vol', 'EEG']
+            header = ['Waktu', 'Vol ASI', 'Relaksasi']
             writer = csv.DictWriter(file, fieldnames = header)
             writer.writeheader()
         file.close()
-        file = open('/home/bimanjaya/learner/TA/relaxation-chair-GUI/data_logger/load_cell/'+date_now()+'_'+time_now()+'.csv', 'a+', newline ='')
+        file = open('/home/san/load_cell/'+date_now()+'_'+time_now()+'.csv', 'a+', newline ='')
         with file:   
             write = csv.writer(file)
             write.writerows(self.csv_data)
@@ -460,22 +489,23 @@ class threading(QtWidgets.QMainWindow):
         self.window = QWidget()
         self.ui = VideoPlayer()
         self.ui.__init__(self.window)
-        self.ui.resize(800,600)
+        self.ui.resize(1024,540)
         if var2 == 1:
             self.window.show()
         if var2 == 0:
             self.window.close()
 
     def start_action_getLoadcell(self,var2_1):
+        # print(f'vol sent : {var2_1}')
         global volRealtime
-        self.realtimeASI.setText(str(volRealtime))
-        self.realtimeASI.adjustSize()
         self.realtimeVol = volRealtime
+        self.realtimeASI.setText(str(self.realtimeVol))
+        self.realtimeASI.adjustSize()
         self.rec_newtime = time.time()
         if ((self.rec_newtime - self.rec_oldtime) >= self.rec_rate):
             self.csv_data_time.append(time_now())
-            self.csv_data_vol.append(volRealtime)
-            self.csv_data_eeg.append(eegRealtime)
+            self.csv_data_vol.append(self.realtimeVol)
+            self.csv_data_eeg.append(self.eegData)
             self.rec_oldtime = self.rec_newtime
             self.volume_mode()
 
@@ -485,7 +515,8 @@ class threading(QtWidgets.QMainWindow):
     def start_action_EEG(self,var2_3=0.0):
         global eegRealtime
         self.eegData = eegRealtime
-        self.realtimeEEG.setText(str(eegRealtime))
+        # print(f'EEG sent : {self.eegData}')
+        self.realtimeEEG.setText(str(self.eegData))
 
     def start_action_EEG2(self,var16=0.0):
         global eegRealtime2
@@ -586,10 +617,7 @@ class start_thread_getLoadcell(QtCore.QThread):
                 vol = struct.unpack('<f',data2)[0]
             time.sleep(0.01)
             volRealtime = round(vol,2)
-            # variable_holder().volRealtime = vol
-            # print(f'variable_holder().volRealtime : {variable_holder().volRealtime}')
-            # self.vol = vol
-            # print(f'self.vol = {self.vol}')
+            # print(f'vol : {vol}')
             self.any_signal3.emit(vol)
     def stop(self):
         print('Stopping start_thread_getLoadcell...')
@@ -686,10 +714,9 @@ class start_thread_EEG(QtCore.QThread):
                             beta_relative1,beta_relative2,
                             beta_relative3,beta_relative4]
 
+            # print(f'EEG : {loaded.predict_proba([dataset])[0][0]}')
             eegRealtime = round(loaded.predict_proba([dataset])[0][0],3)
-            # print(loaded.predict_proba([dataset])[0][0])
-            # variable_holder().eegRealtime = loaded.predict_proba([dataset])[0][0]
-            self.any_signal5.emit(round(loaded.predict_proba([dataset])[0][0]*100,3))
+            self.any_signal5.emit(loaded.predict_proba([dataset])[0][0]*100)
         
     def stop(self):
         self.keep_alive = False
@@ -978,6 +1005,15 @@ def PROBLEM_LOG():
 #      Ketika "STOP", labelnya ganti balik ke 0
 # HASIL:
 # ------------------------------------------------------------------------
+# 12
+# PROBLEM:
+#     Ketika relay dimasukin ke sistem, ketika start (dimana ketika start relay 
+#     sistem akan mengirimkan 'r' ke arduino), relay ga jalan, dan untuk bisa akuisisi
+#     data load-cell, delaynya lama banget. bisa2 sampai 12 detik. tapi ketika sistem stop
+#     relay mau gerak.
+# IDE:
+# HASIL:
+# ------------------------------------------------------------------------
 
     pass
 
@@ -1060,17 +1096,6 @@ def PROBLEM_LOG_ARCHIEVED():
 #      Nanti timer data_logger pake sistem (NEWTIME - OLDTIME) >= RATE
 # HASIL:
 #      BISA!
-# ------------------------------------------------------------------------
-# 12 - DONE
-# PROBLEM:
-#     Ketika relay dimasukin ke sistem, ketika start (dimana ketika start relay 
-#     sistem akan mengirimkan 'r' ke arduino), relay ga jalan, dan untuk bisa akuisisi
-#     data load-cell, delaynya lama banget. bisa2 sampai 12 detik. tapi ketika sistem stop
-#     relay mau gerak.
-# IDE: 
-#   (gatau lupa)
-# HASIL:
-#    - BISA!
 
     pass
 
