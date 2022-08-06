@@ -18,9 +18,9 @@
     <property name="geometry">
      <rect>
       <x>9</x>
-      <y>39</y>
+      <y>30</y>
       <width>1001</width>
-      <height>211</height>
+      <height>151</height>
      </rect>
     </property>
    </widget>
@@ -41,23 +41,46 @@
     <property name="geometry">
      <rect>
       <x>10</x>
-      <y>290</y>
+      <y>200</y>
       <width>1001</width>
-      <height>211</height>
+      <height>151</height>
      </rect>
     </property>
    </widget>
    <widget class="QLabel" name="label_2">
     <property name="geometry">
      <rect>
-      <x>400</x>
-      <y>260</y>
-      <width>281</width>
+      <x>380</x>
+      <y>180</y>
+      <width>311</width>
       <height>21</height>
      </rect>
     </property>
     <property name="text">
-     <string>GRAFIK RELAKSASI TERHADAP WAKTU</string>
+     <string>GRAFIK RELAKSASI EEG TERHADAP WAKTU</string>
+    </property>
+   </widget>
+   <widget class="MplWidget" name="MplWidget3" native="true">
+    <property name="geometry">
+     <rect>
+      <x>10</x>
+      <y>370</y>
+      <width>1001</width>
+      <height>151</height>
+     </rect>
+    </property>
+   </widget>
+   <widget class="QLabel" name="label_3">
+    <property name="geometry">
+     <rect>
+      <x>370</x>
+      <y>350</y>
+      <width>331</width>
+      <height>21</height>
+     </rect>
+    </property>
+    <property name="text">
+     <string>GRAFIK RELAKSASI USER TERHADAP WAKTU</string>
     </property>
    </widget>
   </widget>

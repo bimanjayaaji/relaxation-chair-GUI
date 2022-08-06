@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split, cross_val_score
 from PyQt5.QtWidgets import QMessageBox, QWidget, QApplication
 from sklearn.metrics import classification_report
 from PyQt5 import QtCore, QtWidgets, QtGui, uic
-from multimediav1 import VideoPlayer
+from multimediav2 import VideoPlayer
 from joblib import dump,load
 from sklearn.svm import SVC
 import matplotlib.pyplot as plt
@@ -22,6 +22,7 @@ import time
 import sys 
 import csv 
 
+x = 0
 eegRealtime = 0
 volRealtime = 0
 volRealtime_old = 0
@@ -29,6 +30,7 @@ eegRealtime2 = 0
 csv_data_time = []
 csv_data_vol = []
 csv_data_eeg = []
+csv_data_relax = []
 
 def serial_checker():
     port_name = ''
@@ -103,6 +105,12 @@ class plotWindow(QtWidgets.QMainWindow):
         xmin, xmax = self.MplWidget2.canvas.axes.get_xlim()
         self.MplWidget2.canvas.axes.set_xticks(np.round(np.linspace(xmin, xmax, 5), 2))
         self.MplWidget2.canvas.draw()
+
+        self.MplWidget3.canvas.axes.clear()
+        self.MplWidget3.canvas.axes.plot(csv_data_time, csv_data_relax)
+        xmin, xmax = self.MplWidget3.canvas.axes.get_xlim()
+        self.MplWidget3.canvas.axes.set_xticks(np.round(np.linspace(xmin, xmax, 5), 2))
+        self.MplWidget3.canvas.draw()
 
 class threading(QtWidgets.QMainWindow):
     def __init__(self):
@@ -289,6 +297,7 @@ class threading(QtWidgets.QMainWindow):
         self.csv_data_time = []
         self.csv_data_vol = []
         self.csv_data_eeg = []
+        self.csv_data_relax = []
         self.rec_oldtime = time.time()
         self.rec_newtime = self.rec_oldtime
         self.rec_i = 0
@@ -363,7 +372,7 @@ class threading(QtWidgets.QMainWindow):
             self.thread[8].any_signal8.connect(self.tare_action)
 
     def stop_worker(self):
-        global csv_data_time,csv_data_vol,csv_data_eeg
+        global csv_data_time,csv_data_vol,csv_data_eeg,csv_data_relax
 
         self.startButton.setEnabled(True)
         self.stopButton.setEnabled(False)
@@ -419,10 +428,12 @@ class threading(QtWidgets.QMainWindow):
         csv_data_time = self.csv_data_time
         csv_data_vol = self.csv_data_vol
         csv_data_eeg = self.csv_data_eeg
+        csv_data_relax = self.csv_data_relax
 
     def save_worker(self):
         for i in self.csv_data_time:
             self.csv_data.append([i])
+        j = 0.0
         for j in self.csv_data_vol:
             self.csv_data[self.rec_i].append(j)
             self.rec_i += 1
@@ -431,15 +442,22 @@ class threading(QtWidgets.QMainWindow):
         for k in self.csv_data_eeg:
             self.csv_data[self.rec_i].append(k)
             self.rec_i += 1
+        self.rec_i = 0
+        l = 0.0
+        for l in self.csv_data_relax:
+            self.csv_data[self.rec_i].append(l)
+            self.rec_i += 1
 
         print(self.csv_data)
-        file = open('/home/san/load_cell/'+date_now()+'_'+time_now()+'.csv', 'w', newline ='')
+        # file = open('/home/san/load_cell/'+date_now()+'_'+time_now()+'.csv', 'w', newline ='')
+        file = open('/home/bimanjaya/learner/TA/relaxation-chair-GUI/data_logger/load_cell/'+date_now()+'_'+time_now()+'.csv', 'w', newline ='')
         with file:
-            header = ['Waktu', 'Vol ASI', 'Relaksasi']
+            header = ['Waktu', 'Vol ASI', 'Relaksasi EEG', 'Relaksasi User']
             writer = csv.DictWriter(file, fieldnames = header)
             writer.writeheader()
         file.close()
-        file = open('/home/san/load_cell/'+date_now()+'_'+time_now()+'.csv', 'a+', newline ='')
+        # file = open('/home/san/load_cell/'+date_now()+'_'+time_now()+'.csv', 'a+', newline ='')
+        file = open('/home/bimanjaya/learner/TA/relaxation-chair-GUI/data_logger/load_cell/'+date_now()+'_'+time_now()+'.csv', 'a+', newline ='')
         with file:   
             write = csv.writer(file)
             write.writerows(self.csv_data)
@@ -498,6 +516,14 @@ class threading(QtWidgets.QMainWindow):
         self.thread17_state = 1
         time.sleep(0.2)
 
+    def relaxState_worker(self):
+        global x
+        if x % 2 == 0:
+            x = 1
+        else:
+            x = 0
+        # print(x)
+
 ### ------------------------- ###
 
     def tutorial_action(self,var1):
@@ -510,10 +536,13 @@ class threading(QtWidgets.QMainWindow):
             x = msg.exec_()
 
     def start_action_video(self,var2):
+        global x
+        x = 0
         self.window = QWidget()
         self.ui = VideoPlayer()
         self.ui.__init__(self.window)
         self.ui.resize(1024,540)
+        self.ui.relaxButton.clicked.connect(self.relaxState_worker)
         if var2 == 1:
             self.window.show()
         if var2 == 0:
@@ -521,7 +550,7 @@ class threading(QtWidgets.QMainWindow):
 
     def start_action_getLoadcell(self,var2_1):
         # print(f'vol sent : {var2_1}')
-        global volRealtime
+        global volRealtime, x
         self.realtimeVol = volRealtime
         self.realtimeASI.setText(str(self.realtimeVol))
         self.realtimeASI.adjustSize()
@@ -530,6 +559,7 @@ class threading(QtWidgets.QMainWindow):
             self.csv_data_time.append(time_now())
             self.csv_data_vol.append(self.realtimeVol)
             self.csv_data_eeg.append(self.eegData)
+            self.csv_data_relax.append(x)
             self.rec_oldtime = self.rec_newtime
             self.volume_mode()
 
@@ -591,7 +621,12 @@ class threading(QtWidgets.QMainWindow):
         pass
 
     def start_action_getBatt(self,var11):
-        self.battSOC.setText(str(var11))
+        # print(var11)
+        self.battSOC.setText(str(var11[0]))
+        if var11[1] == 0.0:
+            self.battStatus.setText('Charging')
+        else:
+            self.battStatus.setText('Discharging')
 
 ### ------------------------- ###
 
@@ -940,24 +975,27 @@ class pumpDown_thread(QtCore.QThread):
         pass
 
 class start_thread_getBatt(QtCore.QThread):
-    any_signal17 = QtCore.pyqtSignal(int)
+    any_signal17 = QtCore.pyqtSignal(list)
     def __init__(self,parent=None):
         super(start_thread_getBatt,self).__init__(parent)
         self.is_running = True
     def run(self):
         print('Starting start_thread_getBatt...')
         soc = 0
+        state = 0
         ser = serial.Serial('/dev/ttyUSB1',57600,timeout=1.5)
         ser.flush()
         time.sleep(0.1)
         while (True):
             if ser.in_waiting > 0:
-                data = ser.read(5)
+                data = ser.read(9)
                 data1 = data[1:5]
+                data2 = data[5:9]
                 soc = struct.unpack('<f', data1)[0]
+                state = struct.unpack('<f', data2)[0]
             time.sleep(0.01)
-            print(soc)
-            self.any_signal17.emit(soc)
+            # print(soc)
+            self.any_signal17.emit([soc,state])
     def stop(self):
         print('Stopping start_thread_getBatt...')
         self.is_running = False
@@ -975,21 +1013,8 @@ if __name__ == '__main__':
 
 def TODO_LOG():
 
-# 1. Bikin data logger CSV untuk volume ASI, dan ditampilin secara
-#    grafik di GUI
-#       STEP:
-#       ...
-# 2. Bikin command button mesin pijat:
-#    - Power
-#    - Seat Vibration
-#    - Heat
-#    - Timer(?)  
-# 3. Bikin command button mesin pompa:
-#    - Power
-#    - Mode
-#    - Increase
-#    - Decrease
-# 4. Bikin multimedia window fullscreen
+# 1. Bikin data logger state relaksasi yg manual dari pushButton
+#    dan ditampilin juga di grafik
 
     pass
 
@@ -1062,12 +1087,11 @@ def PROBLEM_LOG():
 #      Ketika "STOP", labelnya ganti balik ke 0
 # HASIL:
 # ------------------------------------------------------------------------
-# 12
+# 14
 # PROBLEM:
-#     Ketika relay dimasukin ke sistem, ketika start (dimana ketika start relay 
-#     sistem akan mengirimkan 'r' ke arduino), relay ga jalan, dan untuk bisa akuisisi
-#     data load-cell, delaynya lama banget. bisa2 sampai 12 detik. tapi ketika sistem stop
-#     relay mau gerak.
+#      Kalau sistem pakai 2 Arduino, seringkali muncul error no 5
+#           mass = struct.unpack('<f', data1)[0]
+#           struct.error: unpack requires a buffer of 4 bytes
 # IDE:
 # HASIL:
 # ------------------------------------------------------------------------
@@ -1153,6 +1177,18 @@ def PROBLEM_LOG_ARCHIEVED():
 #      Nanti timer data_logger pake sistem (NEWTIME - OLDTIME) >= RATE
 # HASIL:
 #      BISA!
+# ------------------------------------------------------------------------
+# 13
+# PROBLEM:
+#     Ketika relay dimasukin ke sistem, ketika start (dimana ketika start relay 
+#     sistem akan mengirimkan 'r' ke arduino), relay ga jalan, dan untuk bisa akuisisi
+#     data load-cell, delaynya lama banget. bisa2 sampai 12 detik. tapi ketika sistem stop
+#     relay mau gerak.
+# IDE: 
+#     (gatau lupa)
+# HASIL: 
+#     BISA!
+# ------------------------------------------------------------------------
 
     pass
 
