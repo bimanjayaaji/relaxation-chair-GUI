@@ -9,12 +9,12 @@ from PyQt5 import QtCore, QtWidgets, QtGui, uic
 from multimediav2 import VideoPlayer
 from joblib import dump,load
 from sklearn.svm import SVC
-import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt ####
 import serial.tools.list_ports
-import seaborn as sns
-import pandas as pd
+import seaborn as sns ###
+import pandas as pd ###
 import numpy as np
-import argparse
+import argparse 
 import datetime
 import serial 
 import struct
@@ -89,7 +89,7 @@ class plotWindow(QtWidgets.QMainWindow):
     def __init__(self):
         global csv_data_time,csv_data_eeg,csv_data_vol
         QtWidgets.QMainWindow.__init__(self)
-        self.ui = uic.loadUi('/home/bimanjaya/learner/TA/relaxation-chair-GUI/plot.ui',self)
+        self.ui = uic.loadUi('/home/bimanjaya/learner/TA/relaxation-chair-GUI/plot-pc.ui',self)
         # self.ui = uic.loadUi('/home/san/Downloads/relaxation-chair-GUI-main/plot.ui',self)
 
         # mainWindow = threading()
@@ -115,8 +115,8 @@ class plotWindow(QtWidgets.QMainWindow):
 class threading(QtWidgets.QMainWindow):
     def __init__(self):
         QtWidgets.QMainWindow.__init__(self)
-        self.ui = uic.loadUi('/home/bimanjaya/learner/TA/relaxation-chair-GUI/sistem-kursi-relaksasi-v6.ui',self)
-        # self.ui = uic.loadUi('/home/san/Downloads/relaxation-chair-GUI-main/sistem-kursi-relaksasi-v6.ui',self)
+        self.ui = uic.loadUi('/home/bimanjaya/learner/TA/relaxation-chair-GUI/sistem-kursi-relaksasi-v6-pc.ui',self)
+        # self.ui = uic.loadUi('/home/san/Downloads/relaxation-chair-GUI-main/sistem-kursi-relaksasi-v6-pc.ui',self)
 
         self.thread = {}
         self.tutorialButton.clicked.connect(self.tutorial_worker)
@@ -182,7 +182,7 @@ class threading(QtWidgets.QMainWindow):
 
         initialize_eeg()
 
-        self.batt_worker()
+        # self.batt_worker()
 
         board.prepare_session()
         board.start_stream()
@@ -286,12 +286,12 @@ class threading(QtWidgets.QMainWindow):
         self.thread6_state = 1
         time.sleep(0.2)
 
-        # START GET EEG DATA
-        self.thread[16] = start_thread_EEG2(parent=None)
-        self.thread[16].start()
-        self.thread[16].any_signal16.connect(self.start_action_EEG2)
-        self.thread16_state = 1
-        time.sleep(0.2)
+        # # START GET EEG DATA
+        # self.thread[16] = start_thread_EEG2(parent=None)
+        # self.thread[16].start()
+        # self.thread[16].any_signal16.connect(self.start_action_EEG2)
+        # self.thread16_state = 1
+        # time.sleep(0.2)
 
         self.csv_data = []
         self.csv_data_time = []
@@ -541,7 +541,7 @@ class threading(QtWidgets.QMainWindow):
         self.window = QWidget()
         self.ui = VideoPlayer()
         self.ui.__init__(self.window)
-        self.ui.resize(1024,540)
+        self.ui.resize(1875,1000)
         self.ui.relaxButton.clicked.connect(self.relaxState_worker)
         if var2 == 1:
             self.window.show()

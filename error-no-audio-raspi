@@ -1,0 +1,113 @@
+_libgcc_mutex             0.1                 conda_forge    conda-forge		ga kedetect
+_openmp_mutex             4.5                       1_gnu    conda-forge		OK
+alsa-lib                  1.2.3                h516909a_0    conda-forge		OK
+attr                      2.4.48               h516909a_0    conda-forge		OK
+ca-certificates           2020.12.5            ha878542_0    conda-forge		OK
+certifi                   2020.12.5        py37h89c1867_1    conda-forge		OK
+dbus                      1.13.6               h48d8840_2    conda-forge		OK
+expat                     2.3.0                h9c3ff4c_0    conda-forge		OK
+fftw                      3.3.9           nompi_h74d3f13_101    conda-forge		OK
+fontconfig                2.13.1            hba837de_1005    conda-forge		OK
+freetype                  2.10.4               h0708190_1    conda-forge		OK
+gettext                   0.19.8.1          h0b5b191_1005    conda-forge		OK
+glib                      2.68.1               h9c3ff4c_0    conda-forge		OK
+glib-tools                2.68.1               h9c3ff4c_0    conda-forge		OK
+gst-plugins-base          1.18.4               hf529b03_2    conda-forge		OK
+gst-plugins-good          1.18.4               h9f60fe5_2    conda-forge		OK
+gst-plugins-good-pulseaudio 1.18.4               h3fd9d12_0    dtk-forge		ga kedetect
+gstreamer                 1.18.4               h76c114f_2    conda-forge		OK
+icu                       68.1                 h58526e2_0    conda-forge		OK
+jack                      1.9.18            h295b1ef_1001    conda-forge		OK
+jpeg                      9d                   h36c2ea0_0    conda-forge		OK
+json-c                    0.15                 h98cffda_0    conda-forge		OK
+krb5                      1.17.2               h926e7f8_0    conda-forge		OK
+lame                      3.100             h7f98852_1001    conda-forge		OK
+ld_impl_linux-64          2.35.1               hea4e1c9_2    conda-forge		OK (aarch64)
+libcap                    2.48                 h7f98852_0    conda-forge		OK
+libclang                  11.1.0          default_ha53f305_0    conda-forge		OK
+libdb                     6.2.32               h9c3ff4c_0    conda-forge		OK
+libedit                   3.1.20191231         he28a2e2_2    conda-forge		OK
+libevent                  2.1.10               hcdb4288_3    conda-forge		OK
+libffi                    3.3                  h58526e2_2    conda-forge		OK
+libflac                   1.3.3                h9c3ff4c_1    conda-forge		OK
+libgcc-ng                 9.3.0               h2828fa1_19    conda-forge		OK
+libgfortran-ng            9.3.0               hff62375_19    conda-forge		OK
+libgfortran5              9.3.0               hff62375_19    conda-forge		OK
+libglib                   2.68.1               h3e27bee_0    conda-forge		OK
+libgomp                   9.3.0               h2828fa1_19    conda-forge		OK
+libiconv                  1.16                 h516909a_0    conda-forge		OK
+libllvm11                 11.1.0               hf817b99_2    conda-forge		OK
+libogg                    1.3.4                h7f98852_1    conda-forge		OK
+libopus                   1.3.1                h7f98852_1    conda-forge		OK
+libpng                    1.6.37               h21135ba_2    conda-forge		OK
+libpq                     13.2                 hfd2b0eb_2    conda-forge		OK
+libsndfile                1.0.31               h9c3ff4c_1    conda-forge		OK
+libstdcxx-ng              9.3.0               h6de172a_19    conda-forge		OK
+libtool                   2.4.6             h58526e2_1007    conda-forge		OK
+libuuid                   2.32.1            h7f98852_1000    conda-forge		OK
+libvorbis                 1.3.7                h9c3ff4c_0    conda-forge		OK
+libxcb                    1.13              h7f98852_1003    conda-forge		OK
+libxkbcommon              1.0.3                he3ba5ed_0    conda-forge		OK
+libxml2                   2.9.10               h72842e0_4    conda-forge		OK
+libxslt                   1.1.33               h15afd5d_2    conda-forge		OK
+lz4-c                     1.9.3                h9c3ff4c_0    conda-forge		OK
+mysql-common              8.0.23               ha770c72_2    conda-forge		OK
+mysql-libs                8.0.23               h935591d_2    conda-forge		OK
+ncurses                   6.2                  h58526e2_4    conda-forge		OK
+nspr                      4.30                 h9c3ff4c_0    conda-forge		OK
+nss                       3.64                 hb5efdd6_0    conda-forge		OK
+openssl                   1.1.1k               h7f98852_0    conda-forge		OK
+pcre                      8.44                 he1b5a44_0    conda-forge		OK
+pip                       21.1.1             pyhd8ed1ab_0    conda-forge		OK
+pthread-stubs             0.4               h36c2ea0_1001    conda-forge		OK
+pulseaudio                14.0                 hb166930_3    conda-forge		OK
+pyside2                   5.13.2           py37hfa98aef_4    conda-forge		ga kedetect
+python                    3.7.10          hffdb5ce_100_cpython    conda-forge	OK
+python_abi                3.7                     1_cp37m    conda-forge		OK
+qt                        5.12.9               hda022c4_4    conda-forge		OK
+readline                  8.1                  h46c0cb4_0    conda-forge		OK
+setuptools                49.6.0           py37h89c1867_3    conda-forge		OK
+sqlite                    3.35.5               h74cdb3f_0    conda-forge		OK
+tk                        8.6.10               h21135ba_1    conda-forge		OK
+wheel                     0.36.2             pyhd3deb0d_0    conda-forge		OK
+xorg-libxau               1.0.9                h7f98852_0    conda-forge		OK
+xorg-libxdmcp             1.1.3                h7f98852_0    conda-forge		OK
+xz                        5.2.5                h516909a_1    conda-forge		OK
+zlib                      1.2.11            h516909a_1010    conda-forge		OK
+zstd                      1.4.9                ha95c52a_0    conda-forge		OK
+
+---
+
+(selebor) bimanjaya@absurdsun:~$ conda install -c dtk-forge gst-plugins-good-pulseaudio
+Collecting package metadata (current_repodata.json): done
+Solving environment: failed with initial frozen solve. Retrying with flexible solve.
+Solving environment: failed with repodata from current_repodata.json, will retry with next repodata source.
+Collecting package metadata (repodata.json): done
+Solving environment: failed with initial frozen solve. Retrying with flexible solve.
+Solving environment: / 
+Found conflicts! Looking for incompatible packages.
+This can take several minutes.  Press CTRL-C to abort.
+failed                                                                          
+
+UnsatisfiableError: The following specifications were found to be incompatible with each other:
+
+Output in format: Requested package -> Available versions
+
+Package _openmp_mutex conflicts for:
+python=3.6.6 -> libgcc-ng[version='>=7.3.0'] -> _openmp_mutex[version='>=4.5']
+gst-plugins-good-pulseaudio -> libgcc-ng[version='>=9.3.0'] -> _openmp_mutex[version='>=4.5']
+
+Package libgcc-ng conflicts for:
+gst-plugins-good-pulseaudio -> gst-plugins-base=1.18 -> libgcc-ng[version='>=7.5.0']
+gst-plugins-good-pulseaudio -> libgcc-ng[version='>=9.3.0']
+
+Package libstdcxx-ng conflicts for:
+gst-plugins-good-pulseaudio -> libstdcxx-ng[version='>=9.3.0']
+gst-plugins-good-pulseaudio -> gst-plugins-base=1.18 -> libstdcxx-ng[version='>=7.5.0']The following specifications were found to be incompatible with your system:
+
+  - feature:/linux-64::__glibc==2.31=0
+  - feature:|@/linux-64::__glibc==2.31=0
+  - python=3.6.6 -> libgcc-ng[version='>=7.3.0'] -> __glibc[version='>=2.17']
+
+Your installed version is: 2.31
+
