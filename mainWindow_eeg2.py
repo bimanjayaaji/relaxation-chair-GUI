@@ -524,6 +524,22 @@ class threading(QtWidgets.QMainWindow):
             x = 0
         # print(x)
 
+        '''
+        x = 0
+        started = 0
+
+        if pB == HIGH:
+            x += 1
+        
+        if x mod 2 == 0:
+            if started == 0:
+                ...
+                started = 1
+        else:
+            ...
+        
+        '''
+
 ### ------------------------- ###
 
     def tutorial_action(self,var1):
