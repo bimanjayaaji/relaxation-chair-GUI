@@ -84,10 +84,18 @@ void loop() {
       newDataReady = 0;
       t = millis();
 
+      if (mass < 0){
+        mass = 0;
+      }
+      if (vol < 0){
+        vol = 0;
+      }
+      
       val.parameter.weight = mass;
       val.parameter.vol = vol;
 
-      //Serial.println(vol);
+      //Serial.print("mass : "); Serial.print(mass);
+      //Serial.print(" | vol : "); Serial.println(vol);
       send_data();
     }
   }
